@@ -17,38 +17,37 @@ import feign.codec.Decoder;
 
 class VerisignMDNSDecoder implements Decoder {
 
-	@Inject
-	public VerisignMDNSDecoder(JAXBHelper jaxbHelper) {
-		this.jaxbHelper = jaxbHelper;
-	}
+  @Inject
+  public VerisignMDNSDecoder(JAXBHelper jaxbHelper) {
+    this.jaxbHelper = jaxbHelper;
+  }
 
-	private final JAXBHelper jaxbHelper;
+  private final JAXBHelper jaxbHelper;
 
-	@Override
-	public Object decode(Response response, Type type) throws IOException, FeignException {
+  @Override
+  public Object decode(Response response, Type type) throws IOException, FeignException {
 
-		try {
+    try {
 
-			JAXBContext jaxbContext = jaxbHelper.getJAXBContext((Class<?>) type);
+      JAXBContext jaxbContext = jaxbHelper.getJAXBContext((Class<?>) type);
 
-			Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+      Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
 
-			JAXBElement<?> object = (JAXBElement<?>) unmarshaller
-					.unmarshal(MessageFactory
-							.newInstance(SOAPConstants.SOAP_1_2_PROTOCOL)
-							.createMessage(null,
-									response.body().asInputStream())
-							.getSOAPBody().extractContentAsDocument());
+      JAXBElement<?> object =
+          (JAXBElement<?>) unmarshaller.unmarshal(MessageFactory
+              .newInstance(SOAPConstants.SOAP_1_2_PROTOCOL)
+              .createMessage(null, response.body().asInputStream()).getSOAPBody()
+              .extractContentAsDocument());
 
-			if (object != null) {
-				return object.getValue();
-			}
+      if (object != null) {
+        return object.getValue();
+      }
 
-			return object;
+      return object;
 
-		} catch (Exception e) {
-			throw new DecodeException(e.getMessage(), e);
-		}
-	}
+    } catch (Exception e) {
+      throw new DecodeException(e.getMessage(), e);
+    }
+  }
 
 }

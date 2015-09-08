@@ -19,32 +19,36 @@ import mdns.wsdl.GetZoneListType;
 import feign.RequestLine;
 
 interface VerisignMDNS {
-	
-	@RequestLine("POST")
-	void updateResourceRecords(@Named("soapObject") JAXBElement<BulkUpdateSingleZone> resourceRecordsType);
-	
-	@RequestLine("POST")
-	void createResourceRecords(@Named("soapObject") JAXBElement<CreateResourceRecordsType> resourceRecordType);
-	
-	@RequestLine("POST")
-	void createZone(@Named("soapObject") JAXBElement<CreateZoneType> createZoneType);
-	
-	@RequestLine("POST")
-	void deleteZone(@Named("soapObject") JAXBElement<DeleteZoneType> deleteZoneType);
-	
-	@RequestLine("POST")
-	void cloneZone(@Named("soapObject") JAXBElement<CloneZoneType> cloneZoneType);
-		
-	@RequestLine("POST")
-	GetZoneListResType getZones(@Named("soapObject") JAXBElement<GetZoneListType> zoneListType);
-	
-	@RequestLine("POST")
-	GetZoneInfoResTypeV2 getZone(@Named("soapObject") JAXBElement<GetZoneInfoTypeV2> zoneInfoType);
-	
-	@RequestLine("POST")
-	GetResourceRecordListResType getResourceRecords(@Named("soapObject") JAXBElement<GetResourceRecordListType> rrType);
-	
-	@RequestLine("POST")
-	GetResourceRecordListGenericResType searchResourceRecords(@Named("soapObject") JAXBElement<GetResourceRecordListGenericType> rrSearchType);
-	
+
+  @RequestLine("POST")
+  void updateResourceRecords(
+      @Named("soapObject") JAXBElement<BulkUpdateSingleZone> resourceRecordsType);
+
+  @RequestLine("POST")
+  void createResourceRecords(
+      @Named("soapObject") JAXBElement<CreateResourceRecordsType> resourceRecordType);
+
+  @RequestLine("POST")
+  void createZone(@Named("soapObject") JAXBElement<CreateZoneType> createZoneType);
+
+  @RequestLine("POST")
+  void deleteZone(@Named("soapObject") JAXBElement<DeleteZoneType> deleteZoneType);
+
+  @RequestLine("POST")
+  void cloneZone(@Named("soapObject") JAXBElement<CloneZoneType> cloneZoneType);
+
+  @RequestLine("POST")
+  GetZoneListResType getZones(@Named("soapObject") JAXBElement<GetZoneListType> zoneListType);
+
+  @RequestLine("POST")
+  GetZoneInfoResTypeV2 getZone(@Named("soapObject") JAXBElement<GetZoneInfoTypeV2> zoneInfoType);
+
+  @RequestLine("POST")
+  GetResourceRecordListResType getResourceRecords(
+      @Named("soapObject") JAXBElement<GetResourceRecordListType> rrType);
+
+  @RequestLine("POST")
+  GetResourceRecordListGenericResType searchResourceRecords(
+      @Named("soapObject") JAXBElement<GetResourceRecordListGenericType> rrSearchType);
+
 }
