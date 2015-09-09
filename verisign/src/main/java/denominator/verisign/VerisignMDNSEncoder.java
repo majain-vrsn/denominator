@@ -4,7 +4,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.xml.bind.JAXBContext;
@@ -30,34 +29,27 @@ class VerisignMDNSEncoder implements Encoder {
   @Override
   public void encode(Object obj, Type bodyType, RequestTemplate template) throws EncodeException {
 
-    @SuppressWarnings("unchecked")
-    Map<String, JAXBElement<?>> formParams = Map.class.cast(obj);
+    JAXBElement<?> soapObject = (JAXBElement<?>) obj;
 
-    if (formParams.containsKey("soapObject")) {
+    ByteArrayOutputStream baos = null;
 
-      JAXBElement<?> soapObject = formParams.get("soapObject");
+    try {
 
-      ByteArrayOutputStream baos = null;
+      JAXBContext jc = jaxbHelper.getJAXBContext(soapObject.getValue().getClass());
 
-      try {
+      Marshaller marshaller = jc.createMarshaller();
+      marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
 
-        JAXBContext jc = jaxbHelper.getJAXBContext(soapObject.getValue().getClass());
+      baos = new ByteArrayOutputStream();
 
-        Marshaller marshaller = jc.createMarshaller();
-        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+      marshaller.marshal(soapObject, baos);
 
-        baos = new ByteArrayOutputStream();
+      template.body(baos.toByteArray(), Charsets.UTF_8);
 
-        marshaller.marshal(soapObject, baos);
-
-        template.body(baos.toByteArray(), Charsets.UTF_8);
-
-      } catch (JAXBException e) {
-        throw new EncodeException(e.getMessage(), e);
-      } finally {
-        close(baos);
-      }
-
+    } catch (JAXBException e) {
+      throw new EncodeException(e.getMessage(), e);
+    } finally {
+      close(baos);
     }
 
   }

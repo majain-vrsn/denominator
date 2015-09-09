@@ -43,7 +43,7 @@ public class VerisignMDNSProvider extends BasicProvider {
     // this.url = url == null || url.isEmpty() ?
     // "https://qa1-api.dns-tool.com/dnsa-ws/V2.0/dnsaapi?wsdl=1" : url;
     this.url =
-        url == null || url.isEmpty() ? "https://qa3-api.dns-tool.com/dnsa-ws/V2.0/dnsaapi?wsdl=1"
+        url == null || url.isEmpty() ? "https://ote-api.verisigndns.com/dnsa-ws/V2.0/dnsaapi?wsdl=1"
             : url;
     this.resourceRecordLimit = null;
   }
