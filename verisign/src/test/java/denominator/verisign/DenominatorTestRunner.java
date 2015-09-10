@@ -13,7 +13,6 @@ public class DenominatorTestRunner {
 
   public static void main(String[] args) {
 
-    // DNSApiManager manager = Denominator.create("verisignmdns", credentials("vrsniotteam", ""));
     DNSApiManager manager =
         Denominator.create("verisignmdns", credentials("vrsniotteam", "end-points.com"));
 

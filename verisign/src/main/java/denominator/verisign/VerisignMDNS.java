@@ -1,6 +1,5 @@
 package denominator.verisign;
 
-import javax.inject.Named;
 import javax.xml.bind.JAXBElement;
 
 import mdns.wsdl.BulkUpdateSingleZone;
@@ -16,39 +15,40 @@ import mdns.wsdl.GetZoneInfoResTypeV2;
 import mdns.wsdl.GetZoneInfoTypeV2;
 import mdns.wsdl.GetZoneListResType;
 import mdns.wsdl.GetZoneListType;
+import feign.Param;
 import feign.RequestLine;
 
 interface VerisignMDNS {
 
   @RequestLine("POST")
   void updateResourceRecords(
-      @Named("soapObject") JAXBElement<BulkUpdateSingleZone> resourceRecordsType);
+      @Param("soapObject") JAXBElement<BulkUpdateSingleZone> resourceRecordsType);
 
   @RequestLine("POST")
   void createResourceRecords(
-      @Named("soapObject") JAXBElement<CreateResourceRecordsType> resourceRecordType);
+      @Param("soapObject") JAXBElement<CreateResourceRecordsType> resourceRecordType);
 
   @RequestLine("POST")
-  void createZone(@Named("soapObject") JAXBElement<CreateZoneType> createZoneType);
+  void createZone(@Param("soapObject") JAXBElement<CreateZoneType> createZoneType);
 
   @RequestLine("POST")
-  void deleteZone(@Named("soapObject") JAXBElement<DeleteZoneType> deleteZoneType);
+  void deleteZone(@Param("soapObject") JAXBElement<DeleteZoneType> deleteZoneType);
 
   @RequestLine("POST")
-  void cloneZone(@Named("soapObject") JAXBElement<CloneZoneType> cloneZoneType);
+  void cloneZone(@Param("soapObject") JAXBElement<CloneZoneType> cloneZoneType);
 
   @RequestLine("POST")
-  GetZoneListResType getZones(@Named("soapObject") JAXBElement<GetZoneListType> zoneListType);
+  GetZoneListResType getZones(@Param("soapObject") JAXBElement<GetZoneListType> zoneListType);
 
   @RequestLine("POST")
-  GetZoneInfoResTypeV2 getZone(@Named("soapObject") JAXBElement<GetZoneInfoTypeV2> zoneInfoType);
+  GetZoneInfoResTypeV2 getZone(@Param("soapObject") JAXBElement<GetZoneInfoTypeV2> zoneInfoType);
 
   @RequestLine("POST")
   GetResourceRecordListResType getResourceRecords(
-      @Named("soapObject") JAXBElement<GetResourceRecordListType> rrType);
+      @Param("soapObject") JAXBElement<GetResourceRecordListType> rrType);
 
   @RequestLine("POST")
   GetResourceRecordListGenericResType searchResourceRecords(
-      @Named("soapObject") JAXBElement<GetResourceRecordListGenericType> rrSearchType);
+      @Param("soapObject") JAXBElement<GetResourceRecordListGenericType> rrSearchType);
 
 }

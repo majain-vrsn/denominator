@@ -17,17 +17,27 @@ import feign.Target;
 
 class VerisignMDNSTarget implements Target<VerisignMDNS> {
 
+  //@formatter:off
   static final String SOAP_TEMPLATE =
       ""
           + //
           "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:com:verisign:dnsa:messaging:schema:1\" xmlns:urn1=\"urn:com:verisign:dnsa:auth:schema:1\" xmlns:urn2=\"urn:com:verisign:dnsa:api:schema:1\"> "
           + "   <soap:Header> " + "      <urn:reliableMessageReq> "
-          + "         <urn:MessageId>%d</urn:MessageId> " + "         <urn:DuplicateElimination/> "
-          + "      </urn:reliableMessageReq> " + "      <urn1:authInfo> "
-          + "         <urn1:userToken> " + "            <urn1:userName>%s</urn1:userName> "
-          + "            <urn1:password>%s</urn1:password> " + "         </urn1:userToken> "
-          + "      </urn1:authInfo> " + "   </soap:Header> " + "   <soap:Body> " + "      %s "
-          + "   </soap:Body> " + "</soap:Envelope> ";
+          + "         <urn:MessageId>%d</urn:MessageId> " 
+          + "         <urn:DuplicateElimination/> "
+          + "      </urn:reliableMessageReq> " 
+          + "      <urn1:authInfo> "
+          + "         <urn1:userToken> " 
+          + "            <urn1:userName>%s</urn1:userName> "
+          + "            <urn1:password>%s</urn1:password> " 
+          + "         </urn1:userToken> "
+          + "      </urn1:authInfo> " 
+          + "   </soap:Header> " 
+          + "   <soap:Body> " 
+          + "      %s "
+          + "   </soap:Body> " 
+          + "</soap:Envelope> ";
+  //@formatter:on
 
   private final Provider provider;
   private final javax.inject.Provider<Credentials> credentials;
