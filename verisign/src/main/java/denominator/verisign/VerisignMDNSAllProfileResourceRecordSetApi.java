@@ -31,6 +31,7 @@ import denominator.AllProfileResourceRecordSetApi;
 import denominator.Provider;
 import denominator.common.Util;
 import denominator.model.ResourceRecordSet;
+import denominator.verisign.VerisignMDNSSaxEncoder.GetRRList;
 
 final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileResourceRecordSetApi {
 
@@ -214,10 +215,11 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
 
   @Override
   public Iterator<ResourceRecordSet<?>> iterator() {
-    GetResourceRecordListType rrListType = new GetResourceRecordListType();
-    rrListType.setDomainName(zoneId);
+    
+    GetRRList getRRList = new GetRRList();
+    getRRList.zoneName = zoneId;
 
-    return new ResourceRecordByNameAndTypeIterator(api, rrListType);
+    return new ResourceRecordByNameAndTypeIterator(api, getRRList);
 
   }
 
@@ -225,12 +227,12 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
   public Iterator<ResourceRecordSet<?>> iterateByName(String name) {
 
     checkNotNull(name, "name");
+    
+    GetRRList getRRList = new GetRRList();
+    getRRList.zoneName = zoneId;
+    getRRList.ownerName = name;
 
-    GetResourceRecordListType rrListType = new GetResourceRecordListType();
-    rrListType.setDomainName(zoneId);
-    rrListType.setOwner(name);
-
-    return new ResourceRecordByNameAndTypeIterator(api, rrListType);
+    return new ResourceRecordByNameAndTypeIterator(api, getRRList);
   }
 
   @Override
@@ -238,13 +240,13 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
 
     checkNotNull(name, "name");
     checkNotNull(type, "type");
+    
+    GetRRList getRRList = new GetRRList();
+    getRRList.ownerName = name;
+    getRRList.type = type;
+    getRRList.zoneName = zoneId;
 
-    GetResourceRecordListType rrListType = new GetResourceRecordListType();
-    rrListType.setDomainName(zoneId);
-    rrListType.setOwner(name);
-    rrListType.setResourceRecordType(ResourceRecordType.fromValue(type));
-
-    return new ResourceRecordByNameAndTypeIterator(api, rrListType);
+    return new ResourceRecordByNameAndTypeIterator(api, getRRList);
   }
 
   @Override
@@ -253,14 +255,14 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
     checkNotNull(name, "name");
     checkNotNull(type, "type");
     checkNotNull(qualifier, "qualifier");
+    
+    GetRRList getRRList = new GetRRList();
+    getRRList.ownerName = name;
+    getRRList.type = type;
+    getRRList.viewName = qualifier;
+    getRRList.zoneName = zoneId;
 
-    GetResourceRecordListType rrListType = new GetResourceRecordListType();
-    rrListType.setDomainName(zoneId);
-    rrListType.setOwner(name);
-    rrListType.setResourceRecordType(ResourceRecordType.fromValue(type));
-    rrListType.setViewName(qualifier);
-
-    return nextOrNull(new ResourceRecordByNameAndTypeIterator(api, rrListType));
+    return nextOrNull(new ResourceRecordByNameAndTypeIterator(api, getRRList));
   }
 
   @Override
@@ -272,24 +274,11 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
     ResourceRecordSet<?> oldRecordSet = nextOrNull(iterateByNameAndType(name, type));
 
     if (oldRecordSet != null) {
-
-      UniqueResourceRecordsType deleteResourceRecord = getUniqueResourceRecordsType(oldRecordSet);
-
-      BulkUpdateSingleZone updateSingleZone = new BulkUpdateSingleZone();
-      updateSingleZone.setDomainName(zoneId);
-      updateSingleZone.setDeleteResourceRecords(deleteResourceRecord);
-
-      api.updateResourceRecords(new ObjectFactory().createBulkUpdateSingleZone(updateSingleZone));
-
+      api.deleteResourceRecords(zoneId, oldRecordSet);
     }
 
   }
 
-  private int getTotalRRCount(GetResourceRecordListType rrListType) {
-    ResourceRecordByNameAndTypeIterator rrIterator =
-        new ResourceRecordByNameAndTypeIterator(0, 2, api, rrListType);
-    return rrIterator.hasNext() ? rrIterator.getTotalCount() : 0;
-  }
 
   static final class Factory implements denominator.AllProfileResourceRecordSetApi.Factory {
 

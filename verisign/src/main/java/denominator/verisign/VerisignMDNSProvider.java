@@ -20,12 +20,15 @@ import denominator.ZoneApi;
 import denominator.config.GeoUnsupported;
 import denominator.config.NothingToClose;
 import denominator.config.WeightedUnsupported;
+import denominator.verisign.VerisignMDNSContentHandlers.RRHandler;
+import denominator.verisign.VerisignMDNSContentHandlers.ZoneListHandler;
 import feign.Feign;
 import feign.Logger;
 import feign.Request.Options;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
 import feign.codec.ErrorDecoder;
+import feign.sax.SAXDecoder;
 
 public class VerisignMDNSProvider extends BasicProvider {
 
@@ -140,24 +143,33 @@ public class VerisignMDNSProvider extends BasicProvider {
 
       Options options = new Options(10 * 1000, 10 * 60 * 1000);
 
-      return Feign.builder().logger(logger).logLevel(logLevel).options(options).encoder(encoder)
-          .decoder(decoder).errorDecoder(errorDecoder).build();
+      return Feign.builder()
+                .logger(logger)
+                .logLevel(logLevel)
+                .options(options)
+                .encoder(encoder)
+                .decoder(decoder)
+                .errorDecoder(errorDecoder)
+                .build();
     }
 
   }
 
-  @dagger.Module(injects = {Encoder.class, Decoder.class, ErrorDecoder.class, JAXBHelper.class},
+  @dagger.Module(injects = {Encoder.class, Decoder.class, ErrorDecoder.class},
       overrides = true)
   static final class XMLCodec {
 
     @Provides
-    Encoder encoder(VerisignMDNSEncoder verisignMDNSEncoder) {
-      return verisignMDNSEncoder;
+    Encoder encoder() {
+      return new VerisignMDNSSaxEncoder();
     }
 
     @Provides
-    Decoder decoder(VerisignMDNSDecoder verisignMDNSDecoder) {
-      return verisignMDNSDecoder;
+    Decoder decoder() {
+      return SAXDecoder.builder()
+          .registerContentHandler(RRHandler.class)
+          .registerContentHandler(ZoneListHandler.class)
+          .build();
     }
 
     @Provides
@@ -165,11 +177,6 @@ public class VerisignMDNSProvider extends BasicProvider {
       return verisignMDNSErrorDecoder;
     }
 
-    @Provides
-    @Singleton
-    JAXBHelper jaxbHelper() {
-      return new JAXBHelper();
-    }
 
   }
 

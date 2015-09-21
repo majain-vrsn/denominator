@@ -1,20 +1,11 @@
 package denominator.verisign;
 
-import javax.xml.bind.JAXBElement;
-
-import mdns.wsdl.BulkUpdateSingleZone;
-import mdns.wsdl.CloneZoneType;
-import mdns.wsdl.CreateResourceRecordsType;
-import mdns.wsdl.CreateZoneType;
-import mdns.wsdl.DeleteZoneType;
-import mdns.wsdl.GetResourceRecordListGenericResType;
-import mdns.wsdl.GetResourceRecordListGenericType;
-import mdns.wsdl.GetResourceRecordListResType;
-import mdns.wsdl.GetResourceRecordListType;
-import mdns.wsdl.GetZoneInfoResTypeV2;
-import mdns.wsdl.GetZoneInfoTypeV2;
-import mdns.wsdl.GetZoneListResType;
-import mdns.wsdl.GetZoneListType;
+import denominator.model.ResourceRecordSet;
+import denominator.model.Zone;
+import denominator.verisign.VerisignMDNSContentHandlers.Page;
+import denominator.verisign.VerisignMDNSContentHandlers.ResourceRecord;
+import denominator.verisign.VerisignMDNSSaxEncoder.GetRRList;
+import denominator.verisign.VerisignMDNSSaxEncoder.Paging;
 import feign.Param;
 import feign.RequestLine;
 
@@ -22,33 +13,31 @@ interface VerisignMDNS {
 
   @RequestLine("POST")
   void updateResourceRecords(
-      @Param("soapObject") JAXBElement<BulkUpdateSingleZone> resourceRecordsType);
+      @Param("zone") String zone, @Param("rrSet") ResourceRecordSet<?> rrSet, @Param("oldRRSet") ResourceRecordSet<?> oldRRSet);
 
   @RequestLine("POST")
-  void createResourceRecords(
-      @Param("soapObject") JAXBElement<CreateResourceRecordsType> resourceRecordType);
+  void createResourceRecords(@Param("zone") String zone, @Param("rrSet") ResourceRecordSet<?> rrSet, @Param("oldRRSet") ResourceRecordSet<?> oldRRSet);
+  
+  @RequestLine("POST")
+  void deleteResourceRecords(@Param("zone") String zone, @Param("deleteRRSet") ResourceRecordSet<?> rrSet);
 
   @RequestLine("POST")
-  void createZone(@Param("soapObject") JAXBElement<CreateZoneType> createZoneType);
+  void createZone(@Param("createZone") Zone zone);
 
   @RequestLine("POST")
-  void deleteZone(@Param("soapObject") JAXBElement<DeleteZoneType> deleteZoneType);
+  void deleteZone(@Param("deleteZone") String zone);
+  
+  @RequestLine("POST")
+  void cloneZone(@Param("cloneZone") String zone);
 
   @RequestLine("POST")
-  void cloneZone(@Param("soapObject") JAXBElement<CloneZoneType> cloneZoneType);
+  Page<Zone> getZones(@Param("getZoneList") Paging paging);
 
   @RequestLine("POST")
-  GetZoneListResType getZones(@Param("soapObject") JAXBElement<GetZoneListType> zoneListType);
+  Zone getZone(@Param("getZone") String zone);
 
   @RequestLine("POST")
-  GetZoneInfoResTypeV2 getZone(@Param("soapObject") JAXBElement<GetZoneInfoTypeV2> zoneInfoType);
+  Page<ResourceRecord> getResourceRecords(@Param("zone") String zone,  @Param("getRRList") GetRRList rrRequest);
 
-  @RequestLine("POST")
-  GetResourceRecordListResType getResourceRecords(
-      @Param("soapObject") JAXBElement<GetResourceRecordListType> rrType);
-
-  @RequestLine("POST")
-  GetResourceRecordListGenericResType searchResourceRecords(
-      @Param("soapObject") JAXBElement<GetResourceRecordListGenericType> rrSearchType);
 
 }

@@ -8,16 +8,14 @@ import java.util.Map;
 
 import com.google.common.collect.Range;
 
-import mdns.wsdl.GetResourceRecordListResType;
-import mdns.wsdl.GetResourceRecordListType;
-import mdns.wsdl.ListPagingInfo;
-import mdns.wsdl.ObjectFactory;
-import mdns.wsdl.ResourceRecord;
-
 import denominator.common.PeekingIterator;
 import denominator.common.Util;
 import denominator.model.ResourceRecordSet;
 import denominator.model.ResourceRecordSet.Builder;
+import denominator.verisign.VerisignMDNSContentHandlers.Page;
+import denominator.verisign.VerisignMDNSContentHandlers.ResourceRecord;
+import denominator.verisign.VerisignMDNSSaxEncoder.GetRRList;
+import denominator.verisign.VerisignMDNSSaxEncoder.Paging;
 
 class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceRecordSet<?>> {
 
@@ -25,26 +23,17 @@ class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceRecordSet<
 
   private final int limit;
   private final VerisignMDNS api;
-  private final GetResourceRecordListType rrListType;
+  private final GetRRList getRRList;
   private PeekingIterator<ResourceRecord> peekingIterator;
   private int offset;
   private int totalCount;
   private boolean isPagingRequired = false;
 
-  public ResourceRecordByNameAndTypeIterator(VerisignMDNS api, GetResourceRecordListType rrListType) {
+  public ResourceRecordByNameAndTypeIterator(VerisignMDNS api, GetRRList getRRList) {
     this.offset = 0;
     this.limit = PAGE_SIZE;
     this.api = api;
-    this.rrListType = rrListType;
-  }
-
-  public ResourceRecordByNameAndTypeIterator(int offset, int limit, VerisignMDNS api,
-      GetResourceRecordListType rrListType) {
-    this.offset = offset;
-    this.limit = limit;
-    this.api = api;
-    this.rrListType = rrListType;
-    this.isPagingRequired = true;
+    this.getRRList = getRRList;
   }
 
   @Override
@@ -83,31 +72,28 @@ class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceRecordSet<
       }
 
     }
+    
+    Paging paging = new Paging();
+    paging.pageSize = PAGE_SIZE;
+    paging.pageNumber = pageNumber;
+    
+    getRRList.paging = paging;
+    
+    Page<denominator.verisign.VerisignMDNSContentHandlers.ResourceRecord> rrPage =
+        api.getResourceRecords(getRRList.zoneName, getRRList);
 
-    ListPagingInfo paging = new ListPagingInfo();
-    paging.setPageSize(mdnsLimit);
-    paging.setPageNumber(pageNumber);
-
-    rrListType.setListPagingInfo(paging);
-
-    GetResourceRecordListResType response =
-        api.getResourceRecords(new ObjectFactory().createGetResourceRecordList(rrListType));
-    this.totalCount = response.getTotalCount();
+    this.totalCount = rrPage.count;
 
     int newOffset = Math.abs(firstIndex - offset);
 
-    int returnedRRSetSize = response.getResourceRecord().size();
+    int returnedRRSetSize = rrPage.list.size();
 
     if (remainder >= 1 && returnedRRSetSize >= newOffset + limit) {
-      this.peekingIterator =
-          peekingIterator(response.getResourceRecord().subList(newOffset, newOffset + limit)
-              .iterator());
+      this.peekingIterator = peekingIterator(rrPage.list.subList(newOffset, newOffset + limit).iterator());
     } else if (remainder >= 1 && totalCount >= newOffset) {
-      this.peekingIterator =
-          peekingIterator(response.getResourceRecord()
-              .subList(newOffset, Math.min(totalCount, newOffset + limit)).iterator());
+      this.peekingIterator = peekingIterator(rrPage.list.subList(newOffset, Math.min(totalCount, newOffset + limit)).iterator());
     } else {
-      this.peekingIterator = peekingIterator(response.getResourceRecord().iterator());
+      this.peekingIterator = peekingIterator(rrPage.list.iterator());
     }
 
   }
@@ -125,13 +111,15 @@ class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceRecordSet<
       return null;
     }
 
-    String type = record.getType().value();
+    String type = record.type;
 
     Builder<Map<String, Object>> builder =
-        ResourceRecordSet.builder().name(record.getOwner()).type(type)
-            .ttl(record.getTtl().intValue());
+        ResourceRecordSet.builder()
+          .name(record.name)
+          .type(type)
+          .ttl(Integer.valueOf(record.ttl));
 
-    builder.add(getRRTypeAndRdata(type, record.getRData()));
+    builder.add(getRRTypeAndRdata(type, record.rdata));
 
     offset++;
 
@@ -142,7 +130,7 @@ class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceRecordSet<
       if (fqdnAndTypeEquals(next, record)) {
         peekingIterator.next();
         offset++;
-        builder.add(getRRTypeAndRdata(type, next.getRData()));
+        builder.add(getRRTypeAndRdata(type, next.rdata));
       } else {
         break;
       }
@@ -162,8 +150,8 @@ class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceRecordSet<
   }
 
   public static boolean fqdnAndTypeEquals(ResourceRecord actual, ResourceRecord expected) {
-    return actual.getOwner().equals(expected.getOwner())
-        && actual.getType().equals(expected.getType());
+    return actual.name.equals(expected.name)
+        && actual.type.equals(expected.type);
   }
 
   public static Map<String, Object> getRRTypeAndRdata(String type, String rdata) {
