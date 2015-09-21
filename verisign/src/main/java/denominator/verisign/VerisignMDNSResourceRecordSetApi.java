@@ -6,10 +6,9 @@ import java.util.Iterator;
 
 import javax.inject.Inject;
 
-import mdns.wsdl.GetResourceRecordListType;
-import mdns.wsdl.ResourceRecordType;
 import denominator.ResourceRecordSetApi;
 import denominator.model.ResourceRecordSet;
+import denominator.verisign.VerisignMDNSSaxEncoder.GetRRList;
 
 final class VerisignMDNSResourceRecordSetApi implements denominator.ResourceRecordSetApi {
 
@@ -36,13 +35,13 @@ final class VerisignMDNSResourceRecordSetApi implements denominator.ResourceReco
 
   @Override
   public ResourceRecordSet<?> getByNameAndType(String name, String type) {
+    
+    GetRRList getRRList = new GetRRList();
+    getRRList.ownerName = name;
+    getRRList.type = type;
+    getRRList.zoneName = zoneName;
 
-    GetResourceRecordListType rrListType = new GetResourceRecordListType();
-    rrListType.setDomainName(zoneName);
-    rrListType.setOwner(name);
-    rrListType.setResourceRecordType(ResourceRecordType.fromValue(type));
-
-    return nextOrNull(new ResourceRecordByNameAndTypeIterator(api, rrListType));
+    return nextOrNull(new ResourceRecordByNameAndTypeIterator(api, getRRList));
   }
 
   @Override

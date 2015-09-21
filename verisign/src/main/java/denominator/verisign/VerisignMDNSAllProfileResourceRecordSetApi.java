@@ -14,8 +14,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import mdns.wsdl.BulkUpdateSingleZone;
-import mdns.wsdl.GetResourceRecordListType;
-import mdns.wsdl.ObjectFactory;
 import mdns.wsdl.ResourceRecordDataType;
 import mdns.wsdl.ResourceRecordType;
 import mdns.wsdl.ResourceRecordsType;
@@ -166,28 +164,9 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
       updateSingleZone.setCreateResourceRecords(createResourceRecords);
     }
 
-    api.updateResourceRecords(new ObjectFactory().createBulkUpdateSingleZone(updateSingleZone));
+    //TODO: fix me
+    //api.updateResourceRecords(new ObjectFactory().createBulkUpdateSingleZone(updateSingleZone));
   }
-
-  private UniqueResourceRecordsType getUniqueResourceRecordsType(ResourceRecordSet<?> rrSet) {
-
-    UniqueResourceRecordsType uniqueResourceRecordsType = new UniqueResourceRecordsType();
-
-    for (Map<String, Object> data : rrSet.records()) {
-
-      UniqueResourceRecordDataType oldResourceRecord = new UniqueResourceRecordDataType();
-      oldResourceRecord.setOwner(rrSet.name());
-      oldResourceRecord.setType(ResourceRecordType.valueOf(rrSet.type()));
-      oldResourceRecord.setRData(Util.flatten(data));
-
-      uniqueResourceRecordsType.getResourceRecord().add(oldResourceRecord);
-
-    }
-
-    return uniqueResourceRecordsType;
-
-  }
-
 
   @Override
   public void deleteByNameTypeAndQualifier(String name, String type, String qualifier) {
@@ -195,21 +174,10 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
     checkNotNull(name, "name");
     checkNotNull(type, "type");
     checkNotNull(qualifier, "rdata for the record");
-
-    UniqueResourceRecordsType deleteResourceRecord = new UniqueResourceRecordsType();
-
-    UniqueResourceRecordDataType oldResourceRecord = new UniqueResourceRecordDataType();
-    oldResourceRecord.setOwner(name);
-    oldResourceRecord.setType(ResourceRecordType.valueOf(type));
-    oldResourceRecord.setRData(qualifier);
-
-    deleteResourceRecord.getResourceRecord().add(oldResourceRecord);
-
-    BulkUpdateSingleZone updateSingleZone = new BulkUpdateSingleZone();
-    updateSingleZone.setDomainName(zoneId);
-    updateSingleZone.setDeleteResourceRecords(deleteResourceRecord);
-
-    api.updateResourceRecords(new ObjectFactory().createBulkUpdateSingleZone(updateSingleZone));
+    
+    ResourceRecordSet<Map<String, Object>> rrSet = ResourceRecordSet.builder().name(name).type(type).add(Util.toMap(type, qualifier)).build();
+    
+    api.deleteResourceRecords(zoneId, rrSet);
 
   }
 
