@@ -67,17 +67,17 @@ class VerisignMDNSContentHandlers {
     int count = 0;
     
     ZoneListHandler() {
-      super("getZoneListRes");
+      super("ns4:getZoneListRes");
     }
     
     @Override
     protected void processElValue(String currentEl, char[] ch, int start, int length) {
      
-      if("totalCount".equals(currentEl)) {
+      if("ns4:totalCount".equals(currentEl)) {
         String value = val(ch, start, length);
         count = Integer.valueOf(value);
         
-      } else if("domainName".equals(currentEl)) {
+      } else if("ns4:domainName".equals(currentEl)) {
         String value = val(ch, start, length);
         zones.add(Zone.create(value, value, 0, "nil@" + value));
       }
@@ -97,13 +97,13 @@ class VerisignMDNSContentHandlers {
     List<ResourceRecord> rrList = new ArrayList<ResourceRecord>();
     
     RRHandler() {
-      super("getResourceRecordListRes");
+      super("ns4:getResourceRecordListRes");
     }
     
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
       super.startElement(uri, localName, qName, attributes);
-      if("resourceRecord".equals(qName)) {
+      if("ns4:resourceRecord".equals(qName)) {
         rrList.add(new ResourceRecord());
       }
     }
@@ -112,19 +112,25 @@ class VerisignMDNSContentHandlers {
     @Override
     protected void processElValue(String currentEl, char[] ch, int start, int length) {
       
+      if(rrList.isEmpty()) {
+        return;
+      }
+      
       ResourceRecord resourceRecord = rrList.get(rrList.size() - 1);
       String value = val(ch, start, length);
       
-      if("totalCount".equals(currentEl)) {
+      if("ns4:totalCount".equals(currentEl)) {
         count = Integer.valueOf(value);
-      } else if("resourceRecordId".equals(currentEl)) {
+      } else if("ns4:resourceRecordId".equals(currentEl)) {
         resourceRecord.id = value;
-      } else if("owner".equals(currentEl)) {
+      } else if("ns4:owner".equals(currentEl)) {
         resourceRecord.name = value;
-      } else if("type".equals(currentEl)) {
+      } else if("ns4:type".equals(currentEl)) {
         resourceRecord.type = value;
-      } else if("rdata".equals(currentEl)) {
+      } else if("ns4:rData".equals(currentEl)) {
         resourceRecord.rdata = value;
+      } else if("ns4:ttl".equals(currentEl)) {
+        resourceRecord.ttl = value;
       }
       
     }

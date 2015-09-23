@@ -26,7 +26,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 import denominator.AllProfileResourceRecordSetApi;
-import denominator.Provider;
 import denominator.common.Util;
 import denominator.model.ResourceRecordSet;
 import denominator.verisign.VerisignMDNSSaxEncoder.GetRRList;
@@ -38,13 +37,10 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
 
   private final VerisignMDNS api;
   private final String zoneId;
-  private final Integer resourceRecordLimit;
 
-  VerisignMDNSAllProfileResourceRecordSetApi(VerisignMDNS api, String zoneId,
-      Integer resourceRecordLimit) {
+  VerisignMDNSAllProfileResourceRecordSetApi(VerisignMDNS api, String zoneId) {
     this.api = api;
     this.zoneId = zoneId;
-    this.resourceRecordLimit = resourceRecordLimit;
   }
 
   @Override
@@ -252,18 +248,14 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
 
     private final VerisignMDNS api;
 
-    private final VerisignMDNSProvider provider;
-
     @Inject
-    Factory(VerisignMDNS api, Provider provider) {
+    Factory(VerisignMDNS api) {
       this.api = api;
-      this.provider = (VerisignMDNSProvider) provider;
     }
 
     @Override
     public VerisignMDNSAllProfileResourceRecordSetApi create(String id) {
-      return new VerisignMDNSAllProfileResourceRecordSetApi(api, id,
-          provider.getResourceRecordLimit());
+      return new VerisignMDNSAllProfileResourceRecordSetApi(api, id);
     }
   }
 

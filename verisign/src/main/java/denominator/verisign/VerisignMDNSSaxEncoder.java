@@ -56,25 +56,27 @@ public class VerisignMDNSSaxEncoder implements Encoder {
     
     Map<String, ?> params = (Map<String, ?>) object;
     
-    String xml = null;
+    Node node = null;
     
     if(params.containsKey("rrSet")) {
-      xml = encodeRRSet(params);
+      node = encodeRRSet(params);
     } else if(params.containsKey("getRRList")) {
-      xml = encodeGetRRList(params);
+      node = encodeGetRRList(params);
     } else if(params.containsKey("createZone")) {
-      xml = encodeCreateZone(params);
+      node = encodeCreateZone(params);
     } else if(params.containsKey("getZoneList")) {
-      xml = encodeGetZoneList(params);
+      node = encodeGetZoneList(params);
     } else if(params.containsKey("deleteRRSet")) {
-      xml = encodeDeleteRRSet(params);
+      node = encodeDeleteRRSet(params);
+    } else {
+      throw new EncodeException("Unsupported param key");
     }
     
-    template.body(xml);
+    template.body(node.toXml());
     
   }
   
-  private String encodeDeleteRRSet(Map<String, ?> params) {
+  private Node encodeDeleteRRSet(Map<String, ?> params) {
     
     Object delteRrSetObject = params.get("deleteRRSet");
     
@@ -99,11 +101,11 @@ public class VerisignMDNSSaxEncoder implements Encoder {
     bulkUpdateZoneNode.add(new TagNode(DOMAIN_NAME_TAG).add(new TextNode(zoneName)));
     bulkUpdateZoneNode.add(deleteRRs);
 
-    return bulkUpdateZoneNode.toXml();
+    return bulkUpdateZoneNode;
     
   }
 
-  private String encodeGetZoneList(Map<String, ?> params) {
+  private Node encodeGetZoneList(Map<String, ?> params) {
     
     Object getZoneListObj = params.get("getZoneList");
     
@@ -119,7 +121,7 @@ public class VerisignMDNSSaxEncoder implements Encoder {
     
     zoneListNode.add(pagingNode);
     
-    return zoneListNode.toXml();
+    return zoneListNode;
     
   }
   
@@ -133,7 +135,7 @@ public class VerisignMDNSSaxEncoder implements Encoder {
     
   }
 
-  private String encodeCreateZone(Map<String, ?> params) {
+  private Node encodeCreateZone(Map<String, ?> params) {
     
     Object createZoneObj = params.get("createZone");
     
@@ -147,11 +149,11 @@ public class VerisignMDNSSaxEncoder implements Encoder {
     zoneNode.add(new TagNode(DOMAIN_NAME_TAG).add(new TextNode(zone.name())));
     zoneNode.add(new TagNode(TYPE_TAG).add(new TextNode("DNS Hosting")));
     
-    return zoneNode.toXml();
+    return zoneNode;
     
   }
   
-  private String encodeGetRRList(Map<String, ?> params) {
+  private Node encodeGetRRList(Map<String, ?> params) {
     
     Object getRRListObj = params.get("getRRList");
     
@@ -178,10 +180,10 @@ public class VerisignMDNSSaxEncoder implements Encoder {
       getRRListNode.add(toPagingNode(getRRList.paging));
     }
     
-    return getRRListNode.toXml();
+    return getRRListNode;
   }
 
-  private String encodeRRSet(Map<String, ?> params) {
+  private Node encodeRRSet(Map<String, ?> params) {
     
     Object rrSetObject = params.get("rrSet");
     
@@ -216,7 +218,7 @@ public class VerisignMDNSSaxEncoder implements Encoder {
       bulkUpdateZoneNode.add(deleteRRs);
     }
     
-    return bulkUpdateZoneNode.toXml();
+    return bulkUpdateZoneNode;
     
   }
   
