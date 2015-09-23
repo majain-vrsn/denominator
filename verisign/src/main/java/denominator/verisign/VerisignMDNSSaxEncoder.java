@@ -12,7 +12,7 @@ import feign.RequestTemplate;
 import feign.codec.EncodeException;
 import feign.codec.Encoder;
 
-public class VerisignMDNSSaxEncoder implements Encoder {
+class VerisignMDNSSaxEncoder implements Encoder {
   
   private static final String BULK_UPDATE_TAG = "urn2:bulkUpdateSingleZone";
   
@@ -26,15 +26,11 @@ public class VerisignMDNSSaxEncoder implements Encoder {
   private static final String RR_TAG = "urn2:resourceRecord";
   
   private static final String UPDATE_RR_TAG = "urn2:updateResourceRecord";
-  
   private static final String OLD_RR_TAG = "urn2:oldResourceRecord";
-  
   private static final String NEW_RR_TAG = "urn2:newResourceRecord";
   
   private static final String CREATE_RRS_TAG = "urn2:createResourceRecords";
-  
   private static final String UPDATE_RRS_TAG = "urn2:updateResourceRecords";
-  
   private static final String DELETE_RRS_TAG = "urn2:deleteResourceRecords";
   
   private static final String GET_RR_LIST_TAG = "urn2:getResourceRecordList";
@@ -46,6 +42,7 @@ public class VerisignMDNSSaxEncoder implements Encoder {
   private static final String PAGE_SIZE_TAG = "urn2:pageSize";
   
   private static final String CREATE_ZONE_TAG = "urn2:createZone";
+  private static final String DELETE_ZONE_TAG = "urn2:deleteZone";
   private static final String GET_ZONE_LIZE_TAG = "urn2:getZoneList";
   
   
@@ -68,6 +65,8 @@ public class VerisignMDNSSaxEncoder implements Encoder {
       node = encodeGetZoneList(params);
     } else if(params.containsKey("deleteRRSet")) {
       node = encodeDeleteRRSet(params);
+    } else if(params.containsKey("deleteZone")) {
+      node = encodeDeleteZone(params);
     } else {
       throw new EncodeException("Unsupported param key");
     }
@@ -76,6 +75,20 @@ public class VerisignMDNSSaxEncoder implements Encoder {
     
   }
   
+  private Node encodeDeleteZone(Map<String, ?> params) {
+    
+    Object delteZoneObject = params.get("deleteZone");
+    
+    if(delteZoneObject == null) {
+      return null;
+    }
+    
+    String zoneName = (String) delteZoneObject;
+    
+    return new TagNode(DELETE_ZONE_TAG).add(new TagNode(DOMAIN_NAME_TAG).add(new TextNode(zoneName)));
+    
+  }
+
   private Node encodeDeleteRRSet(Map<String, ?> params) {
     
     Object delteRrSetObject = params.get("deleteRRSet");

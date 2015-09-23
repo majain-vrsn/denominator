@@ -1,10 +1,6 @@
 package denominator.verisign;
 
-import static com.google.common.base.Predicates.in;
-import static com.google.common.base.Predicates.not;
-import static com.google.common.collect.Iterables.filter;
 import static denominator.common.Preconditions.checkNotNull;
-import static denominator.common.Util.equal;
 import static denominator.common.Util.nextOrNull;
 
 import java.util.Iterator;
@@ -13,27 +9,12 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
-import mdns.wsdl.BulkUpdateSingleZone;
-import mdns.wsdl.ResourceRecordDataType;
-import mdns.wsdl.ResourceRecordType;
-import mdns.wsdl.ResourceRecordsType;
-import mdns.wsdl.UniqueResourceRecordDataType;
-import mdns.wsdl.UniqueResourceRecordsType;
-import mdns.wsdl.UpdateResourceRecordType;
-import mdns.wsdl.UpdateResourceRecordsType;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-
 import denominator.AllProfileResourceRecordSetApi;
 import denominator.common.Util;
 import denominator.model.ResourceRecordSet;
 import denominator.verisign.VerisignMDNSSaxEncoder.GetRRList;
 
 final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileResourceRecordSetApi {
-
-  public static final String MDNS_RESOURCE_RECORD_LIMIT_ERROR_MSG =
-      "Resource record limit exceeded";
 
   private final VerisignMDNS api;
   private final String zoneId;
@@ -56,6 +37,8 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
     }
 
     List<Map<String, Object>> newRData = null;
+    
+    /*
 
     ResourceRecordsType createResourceRecords = null;
 
@@ -159,6 +142,7 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
     if (createResourceRecords != null) {
       updateSingleZone.setCreateResourceRecords(createResourceRecords);
     }
+    */
 
     //TODO: fix me
     //api.updateResourceRecords(new ObjectFactory().createBulkUpdateSingleZone(updateSingleZone));

@@ -9,7 +9,6 @@ import java.util.Set;
 
 import javax.inject.Singleton;
 
-import mdns.wsdl.ResourceRecordType;
 import dagger.Provides;
 import denominator.AllProfileResourceRecordSetApi;
 import denominator.BasicProvider;
@@ -22,6 +21,7 @@ import denominator.config.NothingToClose;
 import denominator.config.WeightedUnsupported;
 import denominator.verisign.VerisignMDNSContentHandlers.RRHandler;
 import denominator.verisign.VerisignMDNSContentHandlers.ZoneListHandler;
+import denominator.verisign.VerisignMDNSSaxErrorDecoder.VerisignMDNSError;
 import feign.Feign;
 import feign.Logger;
 import feign.Request.Options;
@@ -61,11 +61,9 @@ public class VerisignMDNSProvider extends BasicProvider {
   @Override
   public Set<String> basicRecordTypes() {
     Set<String> types = new LinkedHashSet<String>();
-
-    for (ResourceRecordType type : ResourceRecordType.values()) {
-      types.add(type.value());
-    }
-
+    types.addAll(
+        Arrays.asList("A", "AAAA", "CNAME", "HINFO", "MX", "NAPTR", "NS", "PTR", "RP", "SOA", "SPF",
+                      "SRV", "TXT"));
     return types;
   }
 
@@ -167,12 +165,13 @@ public class VerisignMDNSProvider extends BasicProvider {
       return SAXDecoder.builder()
           .registerContentHandler(RRHandler.class)
           .registerContentHandler(ZoneListHandler.class)
+          .registerContentHandler(VerisignMDNSError.class)
           .build();
     }
 
     @Provides
-    ErrorDecoder errorDecoder(VerisignMDNSErrorDecoder verisignMDNSErrorDecoder) {
-      return verisignMDNSErrorDecoder;
+    ErrorDecoder errorDecoder(Decoder decoder) {
+      return new VerisignMDNSSaxErrorDecoder(decoder);
     }
 
 
