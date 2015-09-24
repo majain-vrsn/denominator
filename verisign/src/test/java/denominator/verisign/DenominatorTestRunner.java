@@ -8,6 +8,7 @@ import denominator.AllProfileResourceRecordSetApi;
 import denominator.DNSApiManager;
 import denominator.Denominator;
 import denominator.ZoneApi;
+import denominator.common.Util;
 import denominator.model.ResourceRecordSet;
 import denominator.model.Zone;
 
@@ -22,17 +23,19 @@ public class DenominatorTestRunner {
     
     //zoneApi.delete("hasixtest.com");
     
-    zoneApi.put(Zone.create("hasixtest.com"));
+    //zoneApi.put(Zone.create("hasixtest.com"));
     
-    Iterator<Zone> zoneIterator = zoneApi.iterateByName("hasixtest.com");
+//    Iterator<Zone> zoneIterator = zoneApi.iterateByName("hasixtest.com");
+//    
+//    while(zoneIterator.hasNext()) {
+//      System.out.println(zoneIterator.next().name());
+//    }
     
-    while(zoneIterator.hasNext()) {
-      System.out.println(zoneIterator.next().name());
-    }
-
-    /*
     AllProfileResourceRecordSetApi recordSetsInZoneApi =
-        manager.api().recordSetsInZone("end-points.com");
+        manager.api().recordSetsInZone("hasixtest.com");
+    
+    recordSetsInZoneApi.put(ResourceRecordSet.builder().name("test").type("A").add(Util.toMap("A", "127.0.0.2")).build());
+
 
     Iterator<ResourceRecordSet<?>> rrsIterator = recordSetsInZoneApi.iterator();
 
@@ -40,7 +43,6 @@ public class DenominatorTestRunner {
       ResourceRecordSet<?> rrs = rrsIterator.next();
       System.out.printf("\n\t%s", rrs.toString());// .println(rrs.name());
     }
-     */
 
 
   }

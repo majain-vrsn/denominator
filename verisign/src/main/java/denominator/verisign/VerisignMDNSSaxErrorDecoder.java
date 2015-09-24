@@ -1,7 +1,5 @@
 package denominator.verisign;
 
-import static denominator.common.Util.slurp;
-import static feign.Util.UTF_8;
 import static java.lang.String.format;
 
 import java.io.IOException;
@@ -26,20 +24,11 @@ class VerisignMDNSSaxErrorDecoder implements ErrorDecoder {
     this.decoder = decoder;
   }
   
-  static Response bufferResponse(Response response) throws IOException {
-    if (response.body() == null) {
-      return response;
-    }
-    String body = slurp(response.body().asReader());
-    return Response.create(response.status(), response.reason(), response.headers(), body, UTF_8);
-  }
-
   @Override
   public Exception decode(String methodKey, Response response) {
     
     try {
-      // in case of error parsing, we can access the original contents.
-      response = bufferResponse(response);
+
       VerisignMDNSError error = VerisignMDNSError.class.cast(decoder.decode(response, VerisignMDNSError.class));
       if (error == null) {
         return FeignException.errorStatus(methodKey, response);
@@ -68,8 +57,7 @@ class VerisignMDNSSaxErrorDecoder implements ErrorDecoder {
     private String code;
     
     @Inject
-    VerisignMDNSError() {
-    }
+    VerisignMDNSError() {}
 
     @Override
     public VerisignMDNSError result() {

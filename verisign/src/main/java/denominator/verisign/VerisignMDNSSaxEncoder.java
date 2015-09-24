@@ -14,36 +14,39 @@ import feign.codec.Encoder;
 
 class VerisignMDNSSaxEncoder implements Encoder {
   
-  private static final String BULK_UPDATE_TAG = "urn2:bulkUpdateSingleZone";
+  private static final String BULK_UPDATE_TAG = "bulkUpdateSingleZone";
   
-  private static final String DOMAIN_NAME_TAG = "urn2:domainName";
+  private static final String DOMAIN_NAME_TAG = "domainName";
  
-  private static final String OWNER_TAG = "urn2:owner";
-  private static final String TTL_TAG = "urn2:ttl";
-  private static final String TYPE_TAG = "urn2:type";
-  private static final String RDATA_TAG = "urn2:rData";
+  private static final String OWNER_TAG = "owner";
+  private static final String TTL_TAG = "ttl";
+  private static final String TYPE_TAG = "type";
+  private static final String RDATA_TAG = "rData";
   
-  private static final String RR_TAG = "urn2:resourceRecord";
+  private static final String RR_TAG = "resourceRecord";
   
-  private static final String UPDATE_RR_TAG = "urn2:updateResourceRecord";
-  private static final String OLD_RR_TAG = "urn2:oldResourceRecord";
-  private static final String NEW_RR_TAG = "urn2:newResourceRecord";
+  private static final String UPDATE_RR_TAG = "updateResourceRecord";
+  private static final String OLD_RR_TAG = "oldResourceRecord";
+  private static final String NEW_RR_TAG = "newResourceRecord";
   
-  private static final String CREATE_RRS_TAG = "urn2:createResourceRecords";
-  private static final String UPDATE_RRS_TAG = "urn2:updateResourceRecords";
-  private static final String DELETE_RRS_TAG = "urn2:deleteResourceRecords";
+  private static final String CREATE_RRS_TAG = "createResourceRecords";
+  private static final String UPDATE_RRS_TAG = "updateResourceRecords";
+  private static final String DELETE_RRS_TAG = "deleteResourceRecords";
   
-  private static final String GET_RR_LIST_TAG = "urn2:getResourceRecordList";
+  private static final String GET_RR_LIST_TAG = "getResourceRecordList";
   
-  private static final String RR_TYPE_TAG = "urn2:resourceRecordType";
+  private static final String RR_TYPE_TAG = "resourceRecordType";
   
-  private static final String PAGING_INFO_TAG = "urn2:listPagingInfo";
-  private static final String PAGE_NUMBER_TAG = "urn2:pageNumber";
-  private static final String PAGE_SIZE_TAG = "urn2:pageSize";
+  private static final String PAGING_INFO_TAG = "listPagingInfo";
+  private static final String PAGE_NUMBER_TAG = "pageNumber";
+  private static final String PAGE_SIZE_TAG = "pageSize";
   
-  private static final String CREATE_ZONE_TAG = "urn2:createZone";
-  private static final String DELETE_ZONE_TAG = "urn2:deleteZone";
-  private static final String GET_ZONE_LIZE_TAG = "urn2:getZoneList";
+  private static final String CREATE_ZONE_TAG = "createZone";
+  private static final String DELETE_ZONE_TAG = "deleteZone";
+  private static final String GET_ZONE_LIZE_TAG = "getZoneList";
+  
+  private static final String NS_API_1 = "api1";
+  private static final String NS_API_2 = "api2";
   
   
 
@@ -85,7 +88,7 @@ class VerisignMDNSSaxEncoder implements Encoder {
     
     String zoneName = (String) delteZoneObject;
     
-    return new TagNode(DELETE_ZONE_TAG).add(new TagNode(DOMAIN_NAME_TAG).add(new TextNode(zoneName)));
+    return new TagNode(NS_API_1, DELETE_ZONE_TAG).add(new TagNode(NS_API_1, DOMAIN_NAME_TAG).add(new TextNode(zoneName)));
     
   }
 
@@ -105,13 +108,13 @@ class VerisignMDNSSaxEncoder implements Encoder {
       
       ResourceRecordSet<?> oldRRSet = ResourceRecordSet.class.cast(delteRrSetObject);
       
-      deleteRRs = toRRNode(DELETE_RRS_TAG, oldRRSet, false);
+      deleteRRs = toRRNode(NS_API_1, DELETE_RRS_TAG, oldRRSet, false);
       
     }
     
-    TagNode bulkUpdateZoneNode = new TagNode(BULK_UPDATE_TAG);
+    TagNode bulkUpdateZoneNode = new TagNode(NS_API_1, BULK_UPDATE_TAG);
     
-    bulkUpdateZoneNode.add(new TagNode(DOMAIN_NAME_TAG).add(new TextNode(zoneName)));
+    bulkUpdateZoneNode.add(new TagNode(NS_API_1, DOMAIN_NAME_TAG).add(new TextNode(zoneName)));
     bulkUpdateZoneNode.add(deleteRRs);
 
     return bulkUpdateZoneNode;
@@ -128,7 +131,7 @@ class VerisignMDNSSaxEncoder implements Encoder {
     
     Paging paging = Paging.class.cast(getZoneListObj);
     
-    TagNode zoneListNode = new TagNode(GET_ZONE_LIZE_TAG);
+    TagNode zoneListNode = new TagNode(NS_API_1, GET_ZONE_LIZE_TAG);
     
     Node pagingNode = toPagingNode(paging);
     
@@ -140,9 +143,9 @@ class VerisignMDNSSaxEncoder implements Encoder {
   
   private Node toPagingNode(Paging paging) {
     
-    TagNode pagingNode = new TagNode(PAGING_INFO_TAG);
-    pagingNode.add(new TagNode(PAGE_NUMBER_TAG).add(new TextNode(Integer.toString(paging.pageNumber))));
-    pagingNode.add(new TagNode(PAGE_SIZE_TAG).add(new TextNode(Integer.toString(paging.pageSize))));
+    TagNode pagingNode = new TagNode(NS_API_1, PAGING_INFO_TAG);
+    pagingNode.add(new TagNode(NS_API_1, PAGE_NUMBER_TAG).add(new TextNode(Integer.toString(paging.pageNumber))));
+    pagingNode.add(new TagNode(NS_API_1, PAGE_SIZE_TAG).add(new TextNode(Integer.toString(paging.pageSize))));
     
     return pagingNode;
     
@@ -158,9 +161,9 @@ class VerisignMDNSSaxEncoder implements Encoder {
     
     Zone zone = Zone.class.cast(createZoneObj);
     
-    TagNode zoneNode = new TagNode(CREATE_ZONE_TAG);
-    zoneNode.add(new TagNode(DOMAIN_NAME_TAG).add(new TextNode(zone.name())));
-    zoneNode.add(new TagNode(TYPE_TAG).add(new TextNode("DNS Hosting")));
+    TagNode zoneNode = new TagNode(NS_API_1, CREATE_ZONE_TAG);
+    zoneNode.add(new TagNode(NS_API_1, DOMAIN_NAME_TAG).add(new TextNode(zone.name())));
+    zoneNode.add(new TagNode(NS_API_1, TYPE_TAG).add(new TextNode("DNS Hosting")));
     
     return zoneNode;
     
@@ -178,15 +181,15 @@ class VerisignMDNSSaxEncoder implements Encoder {
     
     GetRRList getRRList = GetRRList.class.cast(getRRListObj);
     
-    TagNode getRRListNode = new TagNode(GET_RR_LIST_TAG);
-    getRRListNode.add(new TagNode(DOMAIN_NAME_TAG).add(new TextNode(zoneName)));
+    TagNode getRRListNode = new TagNode(NS_API_1, GET_RR_LIST_TAG);
+    getRRListNode.add(new TagNode(NS_API_1, DOMAIN_NAME_TAG).add(new TextNode(zoneName)));
     
     if(getRRList.ownerName != null) {
-      getRRListNode.add(new TagNode(OWNER_TAG).add(new TextNode(getRRList.ownerName)));
+      getRRListNode.add(new TagNode(NS_API_1, OWNER_TAG).add(new TextNode(getRRList.ownerName)));
     }
     
     if(getRRList.type != null) {
-      getRRListNode.add(new TagNode(RR_TYPE_TAG).add(new TextNode(getRRList.type)));
+      getRRListNode.add(new TagNode(NS_API_1, RR_TYPE_TAG).add(new TextNode(getRRList.type)));
     }
     
     if(getRRList.paging != null) {
@@ -214,17 +217,17 @@ class VerisignMDNSSaxEncoder implements Encoder {
       
       ResourceRecordSet<?> oldRRSet = ResourceRecordSet.class.cast(oldRRSetObject);
       
-      deleteRRs = toRRNode(DELETE_RRS_TAG, oldRRSet, false);
+      deleteRRs = toRRNode(NS_API_2, DELETE_RRS_TAG, oldRRSet, false);
       
     }
     
     ResourceRecordSet<?> rrSet = ResourceRecordSet.class.cast(rrSetObject);
     
-    Node createRRs = toRRNode(CREATE_RRS_TAG, rrSet, true);
+    Node createRRs = toRRNode(NS_API_2, CREATE_RRS_TAG, rrSet, true);
     
-    TagNode bulkUpdateZoneNode = new TagNode(BULK_UPDATE_TAG);
+    TagNode bulkUpdateZoneNode = new TagNode(NS_API_2, BULK_UPDATE_TAG);
     
-    bulkUpdateZoneNode.add(new TagNode(DOMAIN_NAME_TAG).add(new TextNode(zoneName)));
+    bulkUpdateZoneNode.add(new TagNode(NS_API_2, DOMAIN_NAME_TAG).add(new TextNode(zoneName)));
     bulkUpdateZoneNode.add(createRRs);
     
     if(deleteRRs != null) {
@@ -235,24 +238,24 @@ class VerisignMDNSSaxEncoder implements Encoder {
     
   }
   
-  private Node toRRNode(String tag, ResourceRecordSet<?> rrSet, boolean includeTtl) {
+  private Node toRRNode(String ns, String tag, ResourceRecordSet<?> rrSet, boolean includeTtl) {
 
     String name = rrSet.name();
     String type = rrSet.type();
     Integer ttl = rrSet.ttl();
 
-    TagNode rrsNode = new TagNode(tag);
+    TagNode rrsNode = new TagNode(ns, tag);
 
     for(Map<String, Object> record : rrSet.records()) {
 
-      TagNode rrNode = new TagNode(RR_TAG);
+      TagNode rrNode = new TagNode(ns, RR_TAG);
 
-      rrNode.add(new TagNode(OWNER_TAG).add(new TextNode(name)));
-      rrNode.add(new TagNode(TYPE_TAG).add(new TextNode(type)));
-      rrNode.add(new TagNode(RDATA_TAG).add(new TextNode(Util.flatten(record))));
+      rrNode.add(new TagNode(ns, OWNER_TAG).add(new TextNode(name)));
+      rrNode.add(new TagNode(ns, TYPE_TAG).add(new TextNode(type)));
+      rrNode.add(new TagNode(ns, RDATA_TAG).add(new TextNode(Util.flatten(record))));
 
       if(includeTtl) {
-        rrNode.add(new TagNode(TTL_TAG).add(new TextNode(ttl.toString())));
+        rrNode.add(new TagNode(ns, TTL_TAG).add(new TextNode(ttl.toString())));
       }
 
       rrsNode.add(rrNode);
@@ -299,10 +302,12 @@ class VerisignMDNSSaxEncoder implements Encoder {
   class TagNode implements Node {
     
     private final String tag;
+    private final String ns;
     private final List<Node> children;
     
-    TagNode(String tag) {
+    TagNode(String ns, String tag) {
       this.tag = tag;
+      this.ns = ns;
       this.children = new ArrayList<Node>();
     }
 
@@ -323,11 +328,11 @@ class VerisignMDNSSaxEncoder implements Encoder {
     public String toXml() {
       
       StringBuilder sb = new StringBuilder();
-      sb.append("<").append(tag).append(">");
+      sb.append("<").append(ns).append(":").append(tag).append(">");
       for(Node child: children) {
         sb.append(child.toXml());
       }
-      sb.append("</").append(tag).append(">");
+      sb.append("</").append(ns).append(":").append(tag).append(">");
       
       return sb.toString();
       

@@ -21,7 +21,7 @@ class VerisignMDNSTarget implements Target<VerisignMDNS> {
   static final String SOAP_TEMPLATE =
       ""
           + //
-          "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:com:verisign:dnsa:messaging:schema:1\" xmlns:urn1=\"urn:com:verisign:dnsa:auth:schema:1\" xmlns:urn2=\"urn:com:verisign:dnsa:api:schema:1\"> "
+          "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\" xmlns:urn=\"urn:com:verisign:dnsa:messaging:schema:1\" xmlns:urn1=\"urn:com:verisign:dnsa:auth:schema:1\" xmlns:api1=\"urn:com:verisign:dnsa:api:schema:1\" xmlns:api2=\"urn:com:verisign:dnsa:api:schema:2\"> "
           + "   <soap:Header> " + "      <urn:reliableMessageReq> "
           + "         <urn:MessageId>%d</urn:MessageId> " 
           + "         <urn:DuplicateElimination/> "
