@@ -11,7 +11,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import denominator.Credentials;
-import denominator.Credentials.ListCredentials;
 import denominator.Provider;
 import feign.Request;
 import feign.RequestTemplate;
