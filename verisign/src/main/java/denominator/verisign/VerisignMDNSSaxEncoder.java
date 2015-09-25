@@ -25,12 +25,7 @@ class VerisignMDNSSaxEncoder implements Encoder {
   
   private static final String RR_TAG = "resourceRecord";
   
-  private static final String UPDATE_RR_TAG = "updateResourceRecord";
-  private static final String OLD_RR_TAG = "oldResourceRecord";
-  private static final String NEW_RR_TAG = "newResourceRecord";
-  
   private static final String CREATE_RRS_TAG = "createResourceRecords";
-  private static final String UPDATE_RRS_TAG = "updateResourceRecords";
   private static final String DELETE_RRS_TAG = "deleteResourceRecords";
   
   private static final String GET_RR_LIST_TAG = "getResourceRecordList";

@@ -118,6 +118,8 @@ class VerisignMDNSZoneApi implements denominator.ZoneApi {
     Iterator<Zone> iterator = iterator();
     
     List<Zone> zones = new ArrayList<Zone>();
+
+    //  TODO: improve this with getZoneInfo_V2 call
     
     while(iterator.hasNext()) {
       
