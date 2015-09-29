@@ -26,16 +26,14 @@ class VerisignMDNSZoneApi implements denominator.ZoneApi {
   @Override
   public Iterator<Zone> iterator() {
 
-    final Page<Zone> page =
-        api.getZones(paging(1));
-
+    final Page<Zone> page = api.getZones(paging(1));
     final int pages = (page.count / PAGE_SIZE) + 1;
-
     final Iterator<Zone> currentIterator = page.list.iterator();
 
     if (pages == 1) {
       return currentIterator;
     }
+
     return new Iterator<Zone>() {
       Iterator<Zone> current = currentIterator;
       int i = 1;
@@ -43,7 +41,6 @@ class VerisignMDNSZoneApi implements denominator.ZoneApi {
       @Override
       public boolean hasNext() {
         while (!current.hasNext() && i <= pages) {
-
           Page<Zone> page = api.getZones(paging(++i));
           current = page.list.iterator();
         }
@@ -62,87 +59,42 @@ class VerisignMDNSZoneApi implements denominator.ZoneApi {
       }
     };
   }
-
-  @Override
-  public String put(Zone zone) {
-
-    checkNotNull(zone, "zone");
-    checkNotNull(zone.name(), "zoneName");
-
-    Iterator<Zone> zoneIterator = iterateByName(zone.name());
-
-    boolean isUpdate = false;
-
-    /*
-    while (zoneIterator != null && zoneIterator.hasNext()) {
-
-      Zone oldZone = zoneIterator.next();
-
-      if (!oldZone.name().equals(zone.name())) {
-
-        isUpdate = true;
-
-        CloneZoneType cloneZone = new CloneZoneType();
-        cloneZone.setDomainNameToClone(oldZone.name());
-        cloneZone.setDomainName(zone.name());
-
-        api.cloneZone(new ObjectFactory().createCloneZone(cloneZone));
-
-        delete(oldZone.name());
-      }
-
-    }
-    */
-
-    if (!isUpdate) {
-      api.createZone(zone);
-    }
-
-    return zone.name();
-
-  }
-
-
-  @Override
-  public void delete(String zone) {
-    checkNotNull(zone, "zone");
-    api.deleteZone(zone);
-
-  }
-
+  
   @Override
   public Iterator<Zone> iterateByName(String name) {
-
-    checkNotNull(name, "zoneName");
-    
-    Iterator<Zone> iterator = iterator();
     
     List<Zone> zones = new ArrayList<Zone>();
 
-    //  TODO: improve this with getZoneInfo_V2 call
-    
-    while(iterator.hasNext()) {
-      
-      Zone next = iterator.next();
-      
-      if(name.equalsIgnoreCase(next.name())) {
-        zones.add(next);
-      }
-      
-    }
+    checkNotNull(name, "zoneName");    
+    Zone zone = api.getZone(name);
+
+    if (zone != null)
+      zones.add(zone);
 
     return zones.iterator();
   }
+  
+  @Override
+  public String put(Zone zone) {
+    checkNotNull(zone, "zone");
+    checkNotNull(zone.name(), "zoneName");
 
+    api.createZone(zone);
+    
+    return zone.name();
+  }
+
+  @Override
+  public void delete(String zone) {
+    checkNotNull(zone, "zone");    
+    api.deleteZone(zone);   
+  }
 
   private Paging paging(int pageNumber) {
-
     Paging paging = new Paging();
     paging.pageSize = PAGE_SIZE;
     paging.pageNumber = pageNumber;
 
     return paging;
-
   }
-
 }

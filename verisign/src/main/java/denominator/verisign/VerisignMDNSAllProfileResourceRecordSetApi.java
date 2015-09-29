@@ -34,6 +34,57 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
   }
 
   @Override
+  public Iterator<ResourceRecordSet<?>> iterator() {
+    
+    GetRRList getRRList = new GetRRList();
+    getRRList.zoneName = zoneId;
+
+    return new ResourceRecordByNameAndTypeIterator(api, getRRList);
+  }
+
+  @Override
+  public Iterator<ResourceRecordSet<?>> iterateByName(String name) {
+
+    checkNotNull(name, "name");
+    
+    GetRRList getRRList = new GetRRList();
+    getRRList.zoneName = zoneId;
+    getRRList.ownerName = name;
+
+    return new ResourceRecordByNameAndTypeIterator(api, getRRList);
+  }
+
+  @Override
+  public Iterator<ResourceRecordSet<?>> iterateByNameAndType(String name, String type) {
+
+    checkNotNull(name, "name");
+    checkNotNull(type, "type");
+    
+    GetRRList getRRList = new GetRRList();
+    getRRList.ownerName = name;
+    getRRList.type = type;
+    getRRList.zoneName = zoneId;
+
+    return new ResourceRecordByNameAndTypeIterator(api, getRRList);
+  }
+
+  @Override
+  public ResourceRecordSet<?> getByNameTypeAndQualifier(String name, String type, String qualifier) {
+
+    checkNotNull(name, "name");
+    checkNotNull(type, "type");
+    checkNotNull(qualifier, "qualifier");
+    
+    GetRRList getRRList = new GetRRList();
+    getRRList.ownerName = name;
+    getRRList.type = type;
+    getRRList.viewName = qualifier;
+    getRRList.zoneName = zoneId;
+
+    return nextOrNull(new ResourceRecordByNameAndTypeIterator(api, getRRList));
+  }
+
+  @Override
   public void put(ResourceRecordSet<?> rrset) {
     ResourceRecordSet<?> oldRecordSet = null;
 
@@ -104,72 +155,7 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
     api.updateResourceRecords(zoneId, rrset, deleteRRSet);
 
   }
-
-  @Override
-  public void deleteByNameTypeAndQualifier(String name, String type, String qualifier) {
-
-    checkNotNull(name, "name");
-    checkNotNull(type, "type");
-    checkNotNull(qualifier, "rdata for the record");
-    
-    ResourceRecordSet<Map<String, Object>> rrSet = ResourceRecordSet.builder().name(name).type(type).add(Util.toMap(type, qualifier)).build();
-    
-    api.deleteResourceRecords(zoneId, rrSet);
-
-  }
-
-  @Override
-  public Iterator<ResourceRecordSet<?>> iterator() {
-    
-    GetRRList getRRList = new GetRRList();
-    getRRList.zoneName = zoneId;
-
-    return new ResourceRecordByNameAndTypeIterator(api, getRRList);
-
-  }
-
-  @Override
-  public Iterator<ResourceRecordSet<?>> iterateByName(String name) {
-
-    checkNotNull(name, "name");
-    
-    GetRRList getRRList = new GetRRList();
-    getRRList.zoneName = zoneId;
-    getRRList.ownerName = name;
-
-    return new ResourceRecordByNameAndTypeIterator(api, getRRList);
-  }
-
-  @Override
-  public Iterator<ResourceRecordSet<?>> iterateByNameAndType(String name, String type) {
-
-    checkNotNull(name, "name");
-    checkNotNull(type, "type");
-    
-    GetRRList getRRList = new GetRRList();
-    getRRList.ownerName = name;
-    getRRList.type = type;
-    getRRList.zoneName = zoneId;
-
-    return new ResourceRecordByNameAndTypeIterator(api, getRRList);
-  }
-
-  @Override
-  public ResourceRecordSet<?> getByNameTypeAndQualifier(String name, String type, String qualifier) {
-
-    checkNotNull(name, "name");
-    checkNotNull(type, "type");
-    checkNotNull(qualifier, "qualifier");
-    
-    GetRRList getRRList = new GetRRList();
-    getRRList.ownerName = name;
-    getRRList.type = type;
-    getRRList.viewName = qualifier;
-    getRRList.zoneName = zoneId;
-
-    return nextOrNull(new ResourceRecordByNameAndTypeIterator(api, getRRList));
-  }
-
+  
   @Override
   public void deleteByNameAndType(String name, String type) {
 
@@ -183,7 +169,19 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
     }
 
   }
+  
+  @Override
+  public void deleteByNameTypeAndQualifier(String name, String type, String qualifier) {
 
+    checkNotNull(name, "name");
+    checkNotNull(type, "type");
+    checkNotNull(qualifier, "rdata for the record");
+    
+    ResourceRecordSet<Map<String, Object>> rrSet = ResourceRecordSet.builder().name(name).type(type).add(Util.toMap(type, qualifier)).build();
+    
+    api.deleteResourceRecords(zoneId, rrSet);
+
+  }  
 
   static final class Factory implements denominator.AllProfileResourceRecordSetApi.Factory {
 

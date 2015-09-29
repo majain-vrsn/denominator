@@ -61,6 +61,32 @@ class VerisignMDNSContentHandlers {
     protected abstract void processElValue(String currentEl, char[] ch, int start, int length);
   }
   
+  static class ZoneHandler extends ElementHandler implements ContentHandlerWithResult<Zone> {
+    
+    Zone zone = null;
+    int count = 0;
+    
+    ZoneHandler() {
+      super("ns4:getZoneInfoRes");
+    }
+    
+    @Override
+    protected void processElValue(String currentEl, char[] ch, int start, int length) {
+     
+      if("ns4:domainName".equals(currentEl)) {
+        String value = val(ch, start, length);
+        zone = Zone.create(value, value, 0, "nil." + value);
+      }
+      
+    }
+
+    @Override
+    public Zone result() {
+      return zone;
+    }
+
+  }
+  
   static class ZoneListHandler extends ElementHandler implements ContentHandlerWithResult<Page<Zone>> {
     
     List<Zone> zones = new ArrayList<Zone>();

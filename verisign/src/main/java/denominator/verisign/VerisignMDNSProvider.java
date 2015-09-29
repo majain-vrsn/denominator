@@ -20,6 +20,7 @@ import denominator.config.GeoUnsupported;
 import denominator.config.NothingToClose;
 import denominator.config.WeightedUnsupported;
 import denominator.verisign.VerisignMDNSContentHandlers.RRHandler;
+import denominator.verisign.VerisignMDNSContentHandlers.ZoneHandler;
 import denominator.verisign.VerisignMDNSContentHandlers.ZoneListHandler;
 import denominator.verisign.VerisignMDNSSaxErrorDecoder.VerisignMDNSError;
 import feign.Feign;
@@ -164,6 +165,7 @@ public class VerisignMDNSProvider extends BasicProvider {
     Decoder decoder() {
       return SAXDecoder.builder()
           .registerContentHandler(RRHandler.class)
+          .registerContentHandler(ZoneHandler.class)
           .registerContentHandler(ZoneListHandler.class)
           .registerContentHandler(VerisignMDNSError.class)
           .build();

@@ -88,6 +88,7 @@ class VerisignMDNSTarget implements Target<VerisignMDNS> {
     
     String xml = format(SOAP_TEMPLATE, System.currentTimeMillis(), username, password, new String(in.body(), UTF_8));
     in.body(xml);
+//    System.out.println(xml);
     in.header("Host", URI.create(in.url()).getHost());
     in.header("Content-Type", "application/soap+xml");
     return in.request();
