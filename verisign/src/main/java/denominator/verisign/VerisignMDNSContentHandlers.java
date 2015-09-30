@@ -76,7 +76,7 @@ class VerisignMDNSContentHandlers {
 
       if ("ns4:domainName".equals(currentEl)) {
         String value = val(ch, start, length);
-        zone = Zone.create(value, value, 0, "nil." + value);
+        zone = Zone.create(value, value, 86400, "nil." + value);
       }
 
     }
@@ -107,7 +107,7 @@ class VerisignMDNSContentHandlers {
 
       } else if ("ns4:domainName".equals(currentEl)) {
         String value = val(ch, start, length);
-        zones.add(Zone.create(value, value, 0, "nil@" + value));
+        zones.add(Zone.create(value, value, 86400, "nil." + value));
       }
 
     }

@@ -87,7 +87,14 @@ class VerisignMDNSZoneApi implements denominator.ZoneApi {
   @Override
   public void delete(String zone) {
     checkNotNull(zone, "zone");
-    api.deleteZone(zone);
+    
+    try {
+      api.deleteZone(zone);
+    } catch (VerisignMDNSException e) {
+      if (!e.code().equalsIgnoreCase("ERROR_OPERATION_FAILURE")) {
+        throw e;
+      }
+    }
   }
 
   private Paging paging(int pageNumber) {

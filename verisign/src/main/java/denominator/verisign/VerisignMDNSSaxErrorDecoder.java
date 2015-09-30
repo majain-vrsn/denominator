@@ -34,6 +34,7 @@ class VerisignMDNSSaxErrorDecoder implements ErrorDecoder {
       if (error == null) {
         return FeignException.errorStatus(methodKey, response);
       }
+
       String message = format("%s failed", methodKey);
 
       if (error.code != null) {
@@ -42,8 +43,8 @@ class VerisignMDNSSaxErrorDecoder implements ErrorDecoder {
       if (error.description != null) {
         message = format("%s: %s", message, error.description);
       }
-
       return new VerisignMDNSException(message, error.code);
+
     } catch (IOException ignored) {
       return FeignException.errorStatus(methodKey, response);
     } catch (Exception propagate) {
