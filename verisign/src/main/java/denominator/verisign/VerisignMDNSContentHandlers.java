@@ -13,7 +13,7 @@ import denominator.model.Zone;
 import feign.sax.SAXDecoder.ContentHandlerWithResult;
 
 class VerisignMDNSContentHandlers {
-  
+
   static abstract class ElementHandler extends DefaultHandler {
 
     protected Deque<String> elements = null;
@@ -24,25 +24,26 @@ class VerisignMDNSContentHandlers {
     }
 
     @Override
-    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-      
-      if(parentEl.equals(qName)) {
+    public void startElement(String uri, String localName, String qName, Attributes attributes)
+        throws SAXException {
+
+      if (parentEl.equals(qName)) {
         elements = new ArrayDeque<String>();
       }
-      
-      if(elements != null) {
+
+      if (elements != null) {
         elements.push(qName);
       }
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-     
-      if(elements != null) {
+
+      if (elements != null) {
         elements.pop();
       }
 
-      if(parentEl.equals(qName)) {
+      if (parentEl.equals(qName)) {
         elements = null;
       }
 
@@ -50,34 +51,34 @@ class VerisignMDNSContentHandlers {
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
-      if(elements == null) {
+      if (elements == null) {
         return;
       }
-      
+
       processElValue(elements.peek(), ch, start, length);
 
     }
-    
+
     protected abstract void processElValue(String currentEl, char[] ch, int start, int length);
   }
-  
+
   static class ZoneHandler extends ElementHandler implements ContentHandlerWithResult<Zone> {
-    
+
     Zone zone = null;
     int count = 0;
-    
+
     ZoneHandler() {
       super("ns4:getZoneInfoRes");
     }
-    
+
     @Override
     protected void processElValue(String currentEl, char[] ch, int start, int length) {
-     
-      if("ns4:domainName".equals(currentEl)) {
+
+      if ("ns4:domainName".equals(currentEl)) {
         String value = val(ch, start, length);
         zone = Zone.create(value, value, 0, "nil." + value);
       }
-      
+
     }
 
     @Override
@@ -86,28 +87,29 @@ class VerisignMDNSContentHandlers {
     }
 
   }
-  
-  static class ZoneListHandler extends ElementHandler implements ContentHandlerWithResult<Page<Zone>> {
-    
+
+  static class ZoneListHandler extends ElementHandler implements
+      ContentHandlerWithResult<Page<Zone>> {
+
     List<Zone> zones = new ArrayList<Zone>();
     int count = 0;
-    
+
     ZoneListHandler() {
       super("ns4:getZoneListRes");
     }
-    
+
     @Override
     protected void processElValue(String currentEl, char[] ch, int start, int length) {
-     
-      if("ns4:totalCount".equals(currentEl)) {
+
+      if ("ns4:totalCount".equals(currentEl)) {
         String value = val(ch, start, length);
         count = Integer.valueOf(value);
-        
-      } else if("ns4:domainName".equals(currentEl)) {
+
+      } else if ("ns4:domainName".equals(currentEl)) {
         String value = val(ch, start, length);
         zones.add(Zone.create(value, value, 0, "nil@" + value));
       }
-      
+
     }
 
     @Override
@@ -116,20 +118,22 @@ class VerisignMDNSContentHandlers {
     }
 
   }
-  
-  static class RRHandler extends ElementHandler implements ContentHandlerWithResult<Page<ResourceRecord>> {
-    
+
+  static class RRHandler extends ElementHandler implements
+      ContentHandlerWithResult<Page<ResourceRecord>> {
+
     int count = 0;
     List<ResourceRecord> rrList = new ArrayList<ResourceRecord>();
-    
+
     RRHandler() {
       super("ns4:getResourceRecordListRes");
     }
-    
+
     @Override
-    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+    public void startElement(String uri, String localName, String qName, Attributes attributes)
+        throws SAXException {
       super.startElement(uri, localName, qName, attributes);
-      if("ns4:resourceRecord".equals(qName)) {
+      if ("ns4:resourceRecord".equals(qName)) {
         rrList.add(new ResourceRecord());
       }
     }
@@ -137,28 +141,28 @@ class VerisignMDNSContentHandlers {
 
     @Override
     protected void processElValue(String currentEl, char[] ch, int start, int length) {
-      
-      if(rrList.isEmpty()) {
+
+      if (rrList.isEmpty()) {
         return;
       }
-      
+
       ResourceRecord resourceRecord = rrList.get(rrList.size() - 1);
       String value = val(ch, start, length);
-      
-      if("ns4:totalCount".equals(currentEl)) {
+
+      if ("ns4:totalCount".equals(currentEl)) {
         count = Integer.valueOf(value);
-      } else if("ns4:resourceRecordId".equals(currentEl)) {
+      } else if ("ns4:resourceRecordId".equals(currentEl)) {
         resourceRecord.id = value;
-      } else if("ns4:owner".equals(currentEl)) {
+      } else if ("ns4:owner".equals(currentEl)) {
         resourceRecord.name = value;
-      } else if("ns4:type".equals(currentEl)) {
+      } else if ("ns4:type".equals(currentEl)) {
         resourceRecord.type = value;
-      } else if("ns4:rData".equals(currentEl)) {
+      } else if ("ns4:rData".equals(currentEl)) {
         resourceRecord.rdata = value;
-      } else if("ns4:ttl".equals(currentEl)) {
+      } else if ("ns4:ttl".equals(currentEl)) {
         resourceRecord.ttl = value;
       }
-      
+
     }
 
     @Override
@@ -166,24 +170,24 @@ class VerisignMDNSContentHandlers {
       return new Page<ResourceRecord>(rrList, count);
     }
 
-    
+
   }
-  
+
   static String val(char[] ch, int start, int length) {
     return new String(ch, start, length).trim();
   }
-  
+
   static class Page<T> {
     final List<T> list;
     final int count;
-    
+
     Page(List<T> list, int count) {
-     this.list = list;
-     this.count = count;
+      this.list = list;
+      this.count = count;
     }
-    
+
   }
-  
+
   static class ResourceRecord {
     String id;
     String name;

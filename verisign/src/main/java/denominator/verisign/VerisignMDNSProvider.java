@@ -46,7 +46,9 @@ public class VerisignMDNSProvider extends BasicProvider {
     // "https://api.dns-tool.com/dnsa-ws/V2.0/dnsaapi?wsdl=1" : url;
     // this.url = url == null || url.isEmpty() ?
     // "https://qa1-api.dns-tool.com/dnsa-ws/V2.0/dnsaapi?wsdl=1" : url;
-    this.url =  url == null || url.isEmpty() ? "https://ote-api.verisigndns.com/dnsa-ws/V2.0/dnsaapi?wsdl=1" : url;
+    this.url =
+        url == null || url.isEmpty() ? "https://ote-api.verisigndns.com/dnsa-ws/V2.0/dnsaapi?wsdl=1"
+            : url;
     this.resourceRecordLimit = null;
   }
 
@@ -62,9 +64,8 @@ public class VerisignMDNSProvider extends BasicProvider {
   @Override
   public Set<String> basicRecordTypes() {
     Set<String> types = new LinkedHashSet<String>();
-    types.addAll(
-        Arrays.asList("A", "AAAA", "CNAME", "HINFO", "MX", "NAPTR", "NS", "PTR", "RP", "SOA", "SPF",
-                      "SRV", "TXT"));
+    types.addAll(Arrays.asList("A", "AAAA", "CNAME", "HINFO", "MX", "NAPTR", "NS", "PTR", "RP",
+        "SOA", "SPF", "SRV", "TXT"));
     return types;
   }
 
@@ -140,20 +141,13 @@ public class VerisignMDNSProvider extends BasicProvider {
 
       Options options = new Options(10 * 1000, 10 * 60 * 1000);
 
-      return Feign.builder()
-                .logger(logger)
-                .logLevel(logLevel)
-                .options(options)
-                .encoder(encoder)
-                .decoder(decoder)
-                .errorDecoder(errorDecoder)
-                .build();
+      return Feign.builder().logger(logger).logLevel(logLevel).options(options).encoder(encoder)
+          .decoder(decoder).errorDecoder(errorDecoder).build();
     }
 
   }
 
-  @dagger.Module(injects = {Encoder.class, Decoder.class, ErrorDecoder.class},
-      overrides = true)
+  @dagger.Module(injects = {Encoder.class, Decoder.class, ErrorDecoder.class}, overrides = true)
   static final class XMLCodec {
 
     @Provides
@@ -163,12 +157,9 @@ public class VerisignMDNSProvider extends BasicProvider {
 
     @Provides
     Decoder decoder() {
-      return SAXDecoder.builder()
-          .registerContentHandler(RRHandler.class)
-          .registerContentHandler(ZoneHandler.class)
-          .registerContentHandler(ZoneListHandler.class)
-          .registerContentHandler(VerisignMDNSError.class)
-          .build();
+      return SAXDecoder.builder().registerContentHandler(RRHandler.class)
+          .registerContentHandler(ZoneHandler.class).registerContentHandler(ZoneListHandler.class)
+          .registerContentHandler(VerisignMDNSError.class).build();
     }
 
     @Provides

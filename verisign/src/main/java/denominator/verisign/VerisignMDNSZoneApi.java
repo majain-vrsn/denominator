@@ -59,13 +59,13 @@ class VerisignMDNSZoneApi implements denominator.ZoneApi {
       }
     };
   }
-  
+
   @Override
   public Iterator<Zone> iterateByName(String name) {
-    
+
     List<Zone> zones = new ArrayList<Zone>();
 
-    checkNotNull(name, "zoneName");    
+    checkNotNull(name, "zoneName");
     Zone zone = api.getZone(name);
 
     if (zone != null)
@@ -73,21 +73,21 @@ class VerisignMDNSZoneApi implements denominator.ZoneApi {
 
     return zones.iterator();
   }
-  
+
   @Override
   public String put(Zone zone) {
     checkNotNull(zone, "zone");
     checkNotNull(zone.name(), "zoneName");
 
     api.createZone(zone);
-    
+
     return zone.name();
   }
 
   @Override
   public void delete(String zone) {
-    checkNotNull(zone, "zone");    
-    api.deleteZone(zone);   
+    checkNotNull(zone, "zone");
+    api.deleteZone(zone);
   }
 
   private Paging paging(int pageNumber) {

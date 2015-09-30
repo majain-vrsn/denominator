@@ -35,7 +35,7 @@ final class VerisignMDNSResourceRecordSetApi implements denominator.ResourceReco
 
   @Override
   public ResourceRecordSet<?> getByNameAndType(String name, String type) {
-    
+
     GetRRList getRRList = new GetRRList();
     getRRList.ownerName = name;
     getRRList.type = type;

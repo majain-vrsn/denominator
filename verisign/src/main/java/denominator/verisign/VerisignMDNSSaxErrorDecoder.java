@@ -17,24 +17,25 @@ import feign.codec.ErrorDecoder;
 import feign.sax.SAXDecoder.ContentHandlerWithResult;
 
 class VerisignMDNSSaxErrorDecoder implements ErrorDecoder {
-  
+
   private final Decoder decoder;
 
   VerisignMDNSSaxErrorDecoder(Decoder decoder) {
     this.decoder = decoder;
   }
-  
+
   @Override
   public Exception decode(String methodKey, Response response) {
-    
+
     try {
 
-      VerisignMDNSError error = VerisignMDNSError.class.cast(decoder.decode(response, VerisignMDNSError.class));
+      VerisignMDNSError error =
+          VerisignMDNSError.class.cast(decoder.decode(response, VerisignMDNSError.class));
       if (error == null) {
         return FeignException.errorStatus(methodKey, response);
       }
       String message = format("%s failed", methodKey);
-      
+
       if (error.code != null) {
         message = format("%s with error %s", message, error.code);
       }
@@ -48,14 +49,15 @@ class VerisignMDNSSaxErrorDecoder implements ErrorDecoder {
     } catch (Exception propagate) {
       return propagate;
     }
-    
+
   }
-  
-  static class VerisignMDNSError extends DefaultHandler implements ContentHandlerWithResult<VerisignMDNSError> {
-    
+
+  static class VerisignMDNSError extends DefaultHandler implements
+      ContentHandlerWithResult<VerisignMDNSError> {
+
     private String description;
     private String code;
-    
+
     @Inject
     VerisignMDNSError() {}
 
@@ -67,21 +69,21 @@ class VerisignMDNSSaxErrorDecoder implements ErrorDecoder {
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes)
         throws SAXException {
-      
-      if("ns4:reason".equals(qName)) {
+
+      if ("ns4:reason".equals(qName)) {
         String description = attributes.getValue("description");
-        if(description != null) {
+        if (description != null) {
           this.description = description;
         }
         String code = attributes.getValue("code");
-        if(code != null) {
+        if (code != null) {
           this.code = code;
         }
       }
-      
+
     }
 
-    
+
   }
 
 }

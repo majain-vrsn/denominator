@@ -33,8 +33,7 @@ class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceRecordSet<
   @Override
   public boolean hasNext() {
 
-    if (peekingIterator == null
-        || (!peekingIterator.hasNext() && currentPage < totalPages)) {
+    if (peekingIterator == null || (!peekingIterator.hasNext() && currentPage < totalPages)) {
       initPeekingIterator();
     }
 
@@ -47,12 +46,11 @@ class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceRecordSet<
     Paging paging = new Paging();
     paging.pageSize = PAGE_SIZE;
     paging.pageNumber = ++currentPage;
-    
+
     getRRList.paging = paging;
-    
-    Page<ResourceRecord> rrPage =
-        api.getResourceRecords(getRRList.zoneName, getRRList);
-    
+
+    Page<ResourceRecord> rrPage = api.getResourceRecords(getRRList.zoneName, getRRList);
+
     totalPages = (rrPage.count / PAGE_SIZE) + 1;
 
     this.peekingIterator = peekingIterator(rrPage.list.iterator());
@@ -75,10 +73,7 @@ class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceRecordSet<
     String type = record.type;
 
     Builder<Map<String, Object>> builder =
-        ResourceRecordSet.builder()
-          .name(record.name)
-          .type(type)
-          .ttl(Integer.valueOf(record.ttl));
+        ResourceRecordSet.builder().name(record.name).type(type).ttl(Integer.valueOf(record.ttl));
 
     builder.add(getRRTypeAndRdata(type, record.rdata));
 
@@ -104,8 +99,7 @@ class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceRecordSet<
   }
 
   public static boolean fqdnAndTypeEquals(ResourceRecord actual, ResourceRecord expected) {
-    return actual.name.equals(expected.name)
-        && actual.type.equals(expected.type);
+    return actual.name.equals(expected.name) && actual.type.equals(expected.type);
   }
 
   public static Map<String, Object> getRRTypeAndRdata(String type, String rdata) {

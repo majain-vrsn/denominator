@@ -12,21 +12,23 @@ import feign.RequestLine;
 interface VerisignMDNS {
 
   @RequestLine("POST")
-  void updateResourceRecords(
-      @Param("zone") String zone, @Param("rrSet") ResourceRecordSet<?> rrSet, @Param("oldRRSet") ResourceRecordSet<?> oldRRSet);
+  void updateResourceRecords(@Param("zone") String zone,
+      @Param("rrSet") ResourceRecordSet<?> rrSet, @Param("oldRRSet") ResourceRecordSet<?> oldRRSet);
 
   @RequestLine("POST")
-  void createResourceRecords(@Param("zone") String zone, @Param("rrSet") ResourceRecordSet<?> rrSet, @Param("oldRRSet") ResourceRecordSet<?> oldRRSet);
-  
+  void createResourceRecords(@Param("zone") String zone,
+      @Param("rrSet") ResourceRecordSet<?> rrSet, @Param("oldRRSet") ResourceRecordSet<?> oldRRSet);
+
   @RequestLine("POST")
-  void deleteResourceRecords(@Param("zone") String zone, @Param("deleteRRSet") ResourceRecordSet<?> rrSet);
+  void deleteResourceRecords(@Param("zone") String zone,
+      @Param("deleteRRSet") ResourceRecordSet<?> rrSet);
 
   @RequestLine("POST")
   void createZone(@Param("createZone") Zone zone);
 
   @RequestLine("POST")
   void deleteZone(@Param("deleteZone") String zone);
-  
+
   @RequestLine("POST")
   void cloneZone(@Param("cloneZone") String zone);
 
@@ -37,7 +39,8 @@ interface VerisignMDNS {
   Zone getZone(@Param("getZone") String zone);
 
   @RequestLine("POST")
-  Page<ResourceRecord> getResourceRecords(@Param("zone") String zone,  @Param("getRRList") GetRRList rrRequest);
+  Page<ResourceRecord> getResourceRecords(@Param("zone") String zone,
+      @Param("getRRList") GetRRList rrRequest);
 
 
 }

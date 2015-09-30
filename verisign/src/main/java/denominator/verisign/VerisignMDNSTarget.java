@@ -67,10 +67,10 @@ class VerisignMDNSTarget implements Target<VerisignMDNS> {
   @Override
   public Request apply(RequestTemplate in) {
     in.insert(0, url());
-    
+
     String username;
     String password;
-    
+
     Credentials creds = credentials.get();
     if (creds instanceof List) {
       @SuppressWarnings("unchecked")
@@ -83,16 +83,16 @@ class VerisignMDNSTarget implements Target<VerisignMDNS> {
       username = checkNotNull(mapCreds.get("username"), "username").toString();
       password = checkNotNull(mapCreds.get("password"), "password").toString();
     } else {
-      throw new IllegalArgumentException("Unsupported credential type: "+ creds);
+      throw new IllegalArgumentException("Unsupported credential type: " + creds);
     }
-    
-    String xml = format(SOAP_TEMPLATE, System.currentTimeMillis(), username, password, new String(in.body(), UTF_8));
+
+    String xml =
+        format(SOAP_TEMPLATE, System.currentTimeMillis(), username, password, new String(in.body(),
+            UTF_8));
     in.body(xml);
-//    System.out.println(xml);
+    // System.out.println(xml);
     in.header("Host", URI.create(in.url()).getHost());
     in.header("Content-Type", "application/soap+xml");
     return in.request();
   }
-  
-
 }
