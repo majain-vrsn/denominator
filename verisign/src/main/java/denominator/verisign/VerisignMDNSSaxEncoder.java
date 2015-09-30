@@ -161,13 +161,13 @@ class VerisignMDNSSaxEncoder implements Encoder {
 
       ResourceRecordSet<?> oldRRSet = ResourceRecordSet.class.cast(delteRrSetObject);
 
-      deleteRRs = toRRNode(NS_API_1, DELETE_RRS_TAG, oldRRSet, false);
+      deleteRRs = toRRNode(NS_API_2, DELETE_RRS_TAG, oldRRSet, false);
 
     }
 
-    TagNode bulkUpdateZoneNode = new TagNode(NS_API_1, BULK_UPDATE_TAG);
+    TagNode bulkUpdateZoneNode = new TagNode(NS_API_2, BULK_UPDATE_TAG);
 
-    bulkUpdateZoneNode.add(new TagNode(NS_API_1, DOMAIN_NAME_TAG).add(new TextNode(zoneName)));
+    bulkUpdateZoneNode.add(new TagNode(NS_API_2, DOMAIN_NAME_TAG).add(new TextNode(zoneName)));
     bulkUpdateZoneNode.add(deleteRRs);
 
     return bulkUpdateZoneNode;
@@ -275,7 +275,7 @@ class VerisignMDNSSaxEncoder implements Encoder {
       rrNode.add(new TagNode(ns, TYPE_TAG).add(new TextNode(type)));
       rrNode.add(new TagNode(ns, RDATA_TAG).add(new TextNode(Util.flatten(record))));
 
-      if (includeTtl) {
+      if (includeTtl && ttl != null) {
         rrNode.add(new TagNode(ns, TTL_TAG).add(new TextNode(ttl.toString())));
       }
 
