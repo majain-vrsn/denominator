@@ -164,12 +164,17 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
     checkNotNull(name, "name");
     checkNotNull(type, "type");
 
-    ResourceRecordSet<?> oldRecordSet = nextOrNull(iterateByNameAndType(name, type));
+    try {
+      ResourceRecordSet<?> oldRecordSet = nextOrNull(iterateByNameAndType(name, type));
 
-    if (oldRecordSet != null) {
-      api.deleteResourceRecords(zoneId, oldRecordSet);
+      if (oldRecordSet != null) {
+        api.deleteResourceRecords(zoneId, oldRecordSet);
+      }
+    } catch (VerisignMDNSException e) {
+      if (!e.code().equalsIgnoreCase("ERROR_OPERATION_FAILURE")) {
+        throw e;
+      }
     }
-
   }
 
   @Override
@@ -181,8 +186,14 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
 
     ResourceRecordSet<Map<String, Object>> rrSet =
         ResourceRecordSet.builder().name(name).type(type).add(Util.toMap(type, qualifier)).build();
-
-    api.deleteResourceRecords(zoneId, rrSet);
+        
+    try {
+      api.deleteResourceRecords(zoneId, rrSet);
+    } catch (VerisignMDNSException e) {
+      if (!e.code().equalsIgnoreCase("ERROR_OPERATION_FAILURE")) {
+        throw e;
+      }
+    }
 
   }
 

@@ -23,7 +23,6 @@ public class VerisignMDNSZoneApiMockTest {
 
     assertThat(api.iterator()).containsExactly(
         Zone.create("denominator.io", "denominator.io", 86400, "nil.denominator.io"));
-
   }
 
   @Test
@@ -54,20 +53,35 @@ public class VerisignMDNSZoneApiMockTest {
 
   @Test
   public void putWhenPresent() throws Exception {
-//    TODO
-  }
-  
-  @Test
-  public void putWhenAbsent() throws Exception {
-//    TODO
-  }
-  
-  @Test
-  public void deleteWhenPresent() throws Exception {
-    server.enqueue(new MockResponse());
+    server.enqueueError("ERROR_OPERATION_FAILURE",
+        "Domain already exists. Please verify your domain name.");
 
     ZoneApi api = server.connect().api().zones();
-    api.delete("denominator.io.");
+
+    Zone zone = Zone.create("denominator.io", "denominator.io", 86400, "nil.denominator.io");
+    api.put(zone);
+  }
+
+  @Test
+  public void putWhenAbsent() throws Exception {
+
+    server.enqueue(new MockResponse());
+    ZoneApi api = server.connect().api().zones();
+
+    Zone zone = Zone.create("denominator.io", "denominator.io", 86400, "nil.denominator.io");
+    assertThat(api.put(zone)).isEqualTo(zone.name());
+  }
+
+  @Test
+  public void deleteWhenPresent() throws Exception {
+    server.enqueue(new MockResponse().setBody(
+        "<ns4:dnsaWSRes xmlns=\"urn:com:verisign:dnsa:messaging:schema:1\" xmlns:ns2=\"urn:com:verisign:dnsa:auth:schema:1\" xmlns:ns3=\"urn:com:verisign:dnsa:api:schema:2\" xmlns:ns4=\"urn:com:verisign:dnsa:api:schema:1\">"
+            + "   <ns4:callSuccess>true</ns4:callSuccess>"
+            + "</ns4:dnsaWSRes>"
+       ));
+
+    ZoneApi api = server.connect().api().zones();    
+    api.delete("denominator.io.");    
   }
 
   @Test
@@ -138,6 +152,4 @@ public class VerisignMDNSZoneApiMockTest {
        + "    </ns4:primaryZoneInfo>"
        + " </ns4:getZoneInfoRes>"
   );
-  
-      
 }

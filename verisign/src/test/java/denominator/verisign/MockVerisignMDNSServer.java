@@ -62,7 +62,7 @@ public class MockVerisignMDNSServer extends VerisignMDNSProvider implements Test
 
   RecordedRequestAssert assertSoapBody(String soapBody) throws InterruptedException {
     return assertThat(delegate.takeRequest()).hasMethod("POST").hasPath("/")
-        .hasXMLBody(format(soapTemplate, soapBody));
+        .hasBody(format(soapTemplate, soapBody));
   }
 
   void shutdown() throws IOException {

@@ -78,8 +78,14 @@ class VerisignMDNSZoneApi implements denominator.ZoneApi {
   public String put(Zone zone) {
     checkNotNull(zone, "zone");
     checkNotNull(zone.name(), "zoneName");
-
-    api.createZone(zone);
+    
+    try {
+      api.createZone(zone);
+    } catch (VerisignMDNSException e) {
+      if (!e.code().equalsIgnoreCase("ERROR_OPERATION_FAILURE")) {
+        throw e;
+      }
+    }
 
     return zone.name();
   }
