@@ -4,7 +4,6 @@ import static denominator.CredentialsConfiguration.credentials;
 
 import java.util.Iterator;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import denominator.AllProfileResourceRecordSetApi;
@@ -17,28 +16,7 @@ import denominator.model.Zone;
 
 public class VerisignMdnsTest {
 
-  @Ignore
-  public void xTest() {
-   
-    DNSApiManager manager =
-        Denominator.create("verisignmdns", credentials("vrsniotteam", "end-points.com"));
-
-    AllProfileResourceRecordSetApi recordSetsInZoneApi = manager.api().recordSetsInZone("testzone-1443709838903.com");
-    recordSetsInZoneApi.deleteByNameAndType("www", "A");
-    
-//    Iterator<ResourceRecordSet<?>> rrsIterator = recordSetsInZoneApi.iterator();
-//    
-//    // getResourceRecordByNameAndType
-//    System.out.println("\nQuerying A resource record by name and rrType...");
-//    rrsIterator = recordSetsInZoneApi.iterateByNameAndType("www", "CAA");
-//    while (rrsIterator.hasNext()) {
-//      ResourceRecordSet<?> rrs = rrsIterator.next();
-//      System.out.printf("\t%s", rrs.toString());
-//      System.out.println();
-//    }
-    
-  }
-  
+ 
   @Test
   public void zoneTest() {
 
