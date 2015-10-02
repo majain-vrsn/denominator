@@ -21,34 +21,31 @@ import denominator.AllProfileResourceRecordSetApi;
 import denominator.common.Util;
 import denominator.model.ResourceRecordSet;
 import denominator.model.ResourceRecordSet.Builder;
-import denominator.verisign.VerisignMDNSSaxEncoder.GetRRList;
+import denominator.verisign.VerisignMDNSEncoder.GetRRList;
 
-final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileResourceRecordSetApi {
+public final class VerisignMDNSAllProfileResourceRecordSetApi implements
+    AllProfileResourceRecordSetApi {
 
   private final VerisignMDNS api;
-  private final String zoneId;
+  private final String zoneName;
 
-  VerisignMDNSAllProfileResourceRecordSetApi(VerisignMDNS api, String zoneId) {
+  VerisignMDNSAllProfileResourceRecordSetApi(VerisignMDNS api, String zoneName) {
     this.api = api;
-    this.zoneId = zoneId;
+    this.zoneName = zoneName;
   }
 
   @Override
   public Iterator<ResourceRecordSet<?>> iterator() {
-
     GetRRList getRRList = new GetRRList();
-    getRRList.zoneName = zoneId;
-
+    getRRList.zoneName = zoneName;
     return new ResourceRecordByNameAndTypeIterator(api, getRRList);
   }
 
   @Override
   public Iterator<ResourceRecordSet<?>> iterateByName(String name) {
-
     checkNotNull(name, "name");
-
     GetRRList getRRList = new GetRRList();
-    getRRList.zoneName = zoneId;
+    getRRList.zoneName = zoneName;
     getRRList.ownerName = name;
 
     return new ResourceRecordByNameAndTypeIterator(api, getRRList);
@@ -56,119 +53,94 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
 
   @Override
   public Iterator<ResourceRecordSet<?>> iterateByNameAndType(String name, String type) {
-
     checkNotNull(name, "name");
     checkNotNull(type, "type");
-
     GetRRList getRRList = new GetRRList();
     getRRList.ownerName = name;
     getRRList.type = type;
-    getRRList.zoneName = zoneId;
-
+    getRRList.zoneName = zoneName;
     return new ResourceRecordByNameAndTypeIterator(api, getRRList);
   }
 
   @Override
   public ResourceRecordSet<?> getByNameTypeAndQualifier(String name, String type, String qualifier) {
-
     checkNotNull(name, "name");
     checkNotNull(type, "type");
     checkNotNull(qualifier, "qualifier");
-
     GetRRList getRRList = new GetRRList();
     getRRList.ownerName = name;
     getRRList.type = type;
     getRRList.viewName = qualifier;
-    getRRList.zoneName = zoneId;
+    getRRList.zoneName = zoneName;
 
     return nextOrNull(new ResourceRecordByNameAndTypeIterator(api, getRRList));
   }
 
   @Override
   public void put(ResourceRecordSet<?> rrset) {
-    ResourceRecordSet<?> oldRecordSet = null;
-
+    checkNotNull(rrset, "rrset was null");
     int ttlToApply = rrset.ttl() != null ? rrset.ttl() : 86400;
 
+    ResourceRecordSet<?> oldRRSet = null;
     if (rrset.qualifier() != null) {
-      oldRecordSet = getByNameTypeAndQualifier(rrset.name(), rrset.type(), rrset.qualifier());
+      oldRRSet = getByNameTypeAndQualifier(rrset.name(), rrset.type(), rrset.qualifier());
     } else {
-      oldRecordSet = nextOrNull(iterateByNameAndType(rrset.name(), rrset.type()));
+      oldRRSet = nextOrNull(iterateByNameAndType(rrset.name(), rrset.type()));
     }
 
-    List<Map<String, Object>> newRData = null;
-    List<Map<String, Object>> oldRData = null;
+    List<Map<String, Object>> newRRData = null;
+    List<Map<String, Object>> oldRRData = null;
+    Builder<Map<String, Object>> newRRSetBuilder = ResourceRecordSet.builder();
+    Builder<Map<String, Object>> deleteRRSetBuilder = ResourceRecordSet.builder();
 
-    Builder<Map<String, Object>> newRRSetBilder = ResourceRecordSet.builder();
-    Builder<Map<String, Object>> deleteRRSetBilder = ResourceRecordSet.builder();
-
-
-    if (oldRecordSet != null) {
-
-      newRData = Lists.newArrayList(filter(rrset.records(), not(in(oldRecordSet.records()))));
-
-      if (newRData.isEmpty() && !equal(oldRecordSet.ttl(), Integer.valueOf(ttlToApply))) {
-
-        oldRData = new ArrayList<Map<String, Object>>();
-
-        oldRData.addAll(oldRecordSet.records());
-
-
-      } else if (newRData.isEmpty() && equal(oldRecordSet.ttl(), Integer.valueOf(ttlToApply))) {
-
+    if (oldRRSet != null) {
+      newRRData = Lists.newArrayList(filter(rrset.records(), not(in(oldRRSet.records()))));
+      if (newRRData.isEmpty() && !equal(oldRRSet.ttl(), Integer.valueOf(ttlToApply))) {
+        oldRRData = new ArrayList<Map<String, Object>>();
+        oldRRData.addAll(oldRRSet.records());
+      } else if (newRRData.isEmpty() && equal(oldRRSet.ttl(), Integer.valueOf(ttlToApply))) {
         return;
-
       } else {
+        List<Map<String, Object>> oldRRDataList =
+            ImmutableList.copyOf(filter(oldRRSet.records(), in(rrset.records())));
 
-        List<Map<String, Object>> oldRDataList =
-            ImmutableList.copyOf(filter(oldRecordSet.records(), in(rrset.records())));
-
-        if (!oldRDataList.isEmpty()) {
-          oldRData = new ArrayList<Map<String, Object>>();
-          oldRData.addAll(oldRDataList);
-
-          newRData.addAll(oldRDataList);
-
+        if (!oldRRDataList.isEmpty()) {
+          oldRRData = new ArrayList<Map<String, Object>>();
+          oldRRData.addAll(oldRRDataList);
+          newRRData.addAll(oldRRDataList);
         }
-
       }
-
     } else {
-      newRData = ImmutableList.copyOf(rrset.records());
+      newRRData = ImmutableList.copyOf(rrset.records());
     }
 
-    if (newRData != null && !newRData.isEmpty()) {
+    if (newRRData != null && !newRRData.isEmpty()) {
       rrset =
-          newRRSetBilder.name(rrset.name()).type(rrset.type()).ttl(ttlToApply).addAll(newRData)
+          newRRSetBuilder.name(rrset.name()).type(rrset.type()).ttl(ttlToApply).addAll(newRRData)
               .build();
     }
 
     ResourceRecordSet<Map<String, Object>> deleteRRSet = null;
-
-    if (oldRData != null) {
-      deleteRRSetBilder.ttl(Integer.valueOf(ttlToApply));
-      deleteRRSetBilder.name(oldRecordSet.name());
-      deleteRRSetBilder.type(oldRecordSet.type());
-      deleteRRSetBilder.addAll(oldRData);
-
-      deleteRRSet = deleteRRSetBilder.build();
+    if (oldRRData != null) {
+      deleteRRSetBuilder.ttl(Integer.valueOf(ttlToApply));
+      deleteRRSetBuilder.name(oldRRSet.name());
+      deleteRRSetBuilder.type(oldRRSet.type());
+      deleteRRSetBuilder.addAll(oldRRData);
+      deleteRRSet = deleteRRSetBuilder.build();
     }
 
-    api.updateResourceRecords(zoneId, rrset, deleteRRSet);
-
+    api.updateResourceRecords(zoneName, rrset, deleteRRSet);
   }
 
   @Override
   public void deleteByNameAndType(String name, String type) {
-
     checkNotNull(name, "name");
     checkNotNull(type, "type");
-
     try {
       ResourceRecordSet<?> oldRecordSet = nextOrNull(iterateByNameAndType(name, type));
 
       if (oldRecordSet != null) {
-        api.deleteResourceRecords(zoneId, oldRecordSet);
+        api.deleteResourceRecords(zoneName, oldRecordSet);
       }
     } catch (VerisignMDNSException e) {
       if (!e.code().equalsIgnoreCase("ERROR_OPERATION_FAILURE")) {
@@ -179,22 +151,19 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
 
   @Override
   public void deleteByNameTypeAndQualifier(String name, String type, String qualifier) {
-
     checkNotNull(name, "name");
     checkNotNull(type, "type");
     checkNotNull(qualifier, "rdata for the record");
-
     ResourceRecordSet<Map<String, Object>> rrSet =
         ResourceRecordSet.builder().name(name).type(type).add(Util.toMap(type, qualifier)).build();
-        
+
     try {
-      api.deleteResourceRecords(zoneId, rrSet);
+      api.deleteResourceRecords(zoneName, rrSet);
     } catch (VerisignMDNSException e) {
       if (!e.code().equalsIgnoreCase("ERROR_OPERATION_FAILURE")) {
         throw e;
       }
     }
-
   }
 
   static final class Factory implements denominator.AllProfileResourceRecordSetApi.Factory {
@@ -207,8 +176,8 @@ final class VerisignMDNSAllProfileResourceRecordSetApi implements AllProfileReso
     }
 
     @Override
-    public VerisignMDNSAllProfileResourceRecordSetApi create(String id) {
-      return new VerisignMDNSAllProfileResourceRecordSetApi(api, id);
+    public VerisignMDNSAllProfileResourceRecordSetApi create(String name) {
+      return new VerisignMDNSAllProfileResourceRecordSetApi(api, name);
     }
   }
 

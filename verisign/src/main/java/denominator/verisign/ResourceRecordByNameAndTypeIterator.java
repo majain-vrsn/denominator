@@ -12,8 +12,8 @@ import denominator.model.ResourceRecordSet;
 import denominator.model.ResourceRecordSet.Builder;
 import denominator.verisign.VerisignMDNSContentHandlers.Page;
 import denominator.verisign.VerisignMDNSContentHandlers.ResourceRecord;
-import denominator.verisign.VerisignMDNSSaxEncoder.GetRRList;
-import denominator.verisign.VerisignMDNSSaxEncoder.Paging;
+import denominator.verisign.VerisignMDNSEncoder.GetRRList;
+import denominator.verisign.VerisignMDNSEncoder.Paging;
 
 class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceRecordSet<?>> {
 

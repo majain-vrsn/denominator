@@ -16,11 +16,11 @@ import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
 import feign.sax.SAXDecoder.ContentHandlerWithResult;
 
-class VerisignMDNSSaxErrorDecoder implements ErrorDecoder {
+class VerisignMDNSErrorDecoder implements ErrorDecoder {
 
   private final Decoder decoder;
 
-  VerisignMDNSSaxErrorDecoder(Decoder decoder) {
+  VerisignMDNSErrorDecoder(Decoder decoder) {
     this.decoder = decoder;
   }
 
@@ -28,7 +28,6 @@ class VerisignMDNSSaxErrorDecoder implements ErrorDecoder {
   public Exception decode(String methodKey, Response response) {
 
     try {
-
       VerisignMDNSError error =
           VerisignMDNSError.class.cast(decoder.decode(response, VerisignMDNSError.class));
       if (error == null) {
@@ -36,7 +35,6 @@ class VerisignMDNSSaxErrorDecoder implements ErrorDecoder {
       }
 
       String message = format("%s failed", methodKey);
-
       if (error.code != null) {
         message = format("%s with error %s", message, error.code);
       }
@@ -44,7 +42,6 @@ class VerisignMDNSSaxErrorDecoder implements ErrorDecoder {
         message = format("%s: %s", message, error.description);
       }
       return new VerisignMDNSException(message, error.code);
-
     } catch (IOException ignored) {
       return FeignException.errorStatus(methodKey, response);
     } catch (Exception propagate) {
@@ -60,11 +57,13 @@ class VerisignMDNSSaxErrorDecoder implements ErrorDecoder {
     private String code;
 
     @Inject
-    VerisignMDNSError() {}
+    VerisignMDNSError() {
+      
+    }
 
     @Override
     public VerisignMDNSError result() {
-      return this;
+      return (code == null && description == null) ? null : this;
     }
 
     @Override
@@ -81,10 +80,6 @@ class VerisignMDNSSaxErrorDecoder implements ErrorDecoder {
           this.code = code;
         }
       }
-
     }
-
-
   }
-
 }

@@ -8,9 +8,9 @@ import javax.inject.Inject;
 
 import denominator.ResourceRecordSetApi;
 import denominator.model.ResourceRecordSet;
-import denominator.verisign.VerisignMDNSSaxEncoder.GetRRList;
+import denominator.verisign.VerisignMDNSEncoder.GetRRList;
 
-final class VerisignMDNSResourceRecordSetApi implements denominator.ResourceRecordSetApi {
+public final class VerisignMDNSResourceRecordSetApi implements denominator.ResourceRecordSetApi {
 
   private final VerisignMDNS api;
   private final VerisignMDNSAllProfileResourceRecordSetApi allApi;
@@ -66,8 +66,8 @@ final class VerisignMDNSResourceRecordSetApi implements denominator.ResourceReco
     }
 
     @Override
-    public ResourceRecordSetApi create(String idOrName) {
-      return new VerisignMDNSResourceRecordSetApi(allApi.create(idOrName), api, idOrName);
+    public ResourceRecordSetApi create(String name) {
+      return new VerisignMDNSResourceRecordSetApi(allApi.create(name), api, name);
     }
   }
 

@@ -1,7 +1,5 @@
 package denominator.verisign;
 
-import static denominator.common.Preconditions.checkNotNull;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,9 +8,9 @@ import javax.inject.Inject;
 
 import denominator.model.Zone;
 import denominator.verisign.VerisignMDNSContentHandlers.Page;
-import denominator.verisign.VerisignMDNSSaxEncoder.Paging;
+import denominator.verisign.VerisignMDNSEncoder.Paging;
 
-class VerisignMDNSZoneApi implements denominator.ZoneApi {
+public final class VerisignMDNSZoneApi implements denominator.ZoneApi {
 
   private static final int PAGE_SIZE = 100;
 
@@ -44,7 +42,6 @@ class VerisignMDNSZoneApi implements denominator.ZoneApi {
           Page<Zone> page = api.getZones(paging(++i));
           current = page.list.iterator();
         }
-
         return current.hasNext();
       }
 
@@ -62,12 +59,9 @@ class VerisignMDNSZoneApi implements denominator.ZoneApi {
 
   @Override
   public Iterator<Zone> iterateByName(String name) {
-
     List<Zone> zones = new ArrayList<Zone>();
 
-    checkNotNull(name, "zoneName");
     Zone zone = api.getZone(name);
-
     if (zone != null)
       zones.add(zone);
 
@@ -76,9 +70,6 @@ class VerisignMDNSZoneApi implements denominator.ZoneApi {
 
   @Override
   public String put(Zone zone) {
-    checkNotNull(zone, "zone");
-    checkNotNull(zone.name(), "zoneName");
-    
     try {
       api.createZone(zone);
     } catch (VerisignMDNSException e) {
@@ -92,8 +83,6 @@ class VerisignMDNSZoneApi implements denominator.ZoneApi {
 
   @Override
   public void delete(String zone) {
-    checkNotNull(zone, "zone");
-    
     try {
       api.deleteZone(zone);
     } catch (VerisignMDNSException e) {

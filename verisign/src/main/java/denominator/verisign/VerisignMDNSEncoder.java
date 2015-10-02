@@ -12,7 +12,7 @@ import feign.RequestTemplate;
 import feign.codec.EncodeException;
 import feign.codec.Encoder;
 
-class VerisignMDNSSaxEncoder implements Encoder {
+class VerisignMDNSEncoder implements Encoder {
 
   private static final String BULK_UPDATE_TAG = "bulkUpdateSingleZone";
 

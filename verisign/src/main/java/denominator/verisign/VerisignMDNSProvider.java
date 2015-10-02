@@ -22,7 +22,7 @@ import denominator.config.WeightedUnsupported;
 import denominator.verisign.VerisignMDNSContentHandlers.RRHandler;
 import denominator.verisign.VerisignMDNSContentHandlers.ZoneHandler;
 import denominator.verisign.VerisignMDNSContentHandlers.ZoneListHandler;
-import denominator.verisign.VerisignMDNSSaxErrorDecoder.VerisignMDNSError;
+import denominator.verisign.VerisignMDNSErrorDecoder.VerisignMDNSError;
 import feign.Feign;
 import feign.Logger;
 import feign.Request.Options;
@@ -35,25 +35,17 @@ public class VerisignMDNSProvider extends BasicProvider {
 
   private final String url;
 
-  private final Integer resourceRecordLimit;
-
   public VerisignMDNSProvider() {
     this(null);
   }
 
+  /**
+   * @param url if empty or null use default
+   */
   public VerisignMDNSProvider(String url) {
-    // this.url = url == null || url.isEmpty() ?
-    // "https://api.dns-tool.com/dnsa-ws/V2.0/dnsaapi?wsdl=1" : url;
-    // this.url = url == null || url.isEmpty() ?
-    // "https://qa1-api.dns-tool.com/dnsa-ws/V2.0/dnsaapi?wsdl=1" : url;
     this.url =
         url == null || url.isEmpty() ? "https://ote-api.verisigndns.com/dnsa-ws/V2.0/dnsaapi?wsdl=1"
             : url;
-    this.resourceRecordLimit = null;
-  }
-
-  public Integer getResourceRecordLimit() {
-    return resourceRecordLimit;
   }
 
   @Override
@@ -76,8 +68,10 @@ public class VerisignMDNSProvider extends BasicProvider {
     return options;
   }
 
-  @dagger.Module(injects = {DNSApiManager.class}, complete = false, includes = {
-      NothingToClose.class, WeightedUnsupported.class, GeoUnsupported.class, FeignModule.class})
+  @dagger.Module(injects = {DNSApiManager.class}, complete = false, includes = {NothingToClose.class,
+                                                                                WeightedUnsupported.class,
+                                                                                GeoUnsupported.class,
+                                                                                FeignModule.class})
   public static final class Module {
 
     @Provides
@@ -106,18 +100,22 @@ public class VerisignMDNSProvider extends BasicProvider {
     @Provides
     @Singleton
     AllProfileResourceRecordSetApi.Factory provideAllProfileResourceRecordSetApiFactory(
-        VerisignMDNSAllProfileResourceRecordSetApi.Factory in) {
-      return in;
+        VerisignMDNSAllProfileResourceRecordSetApi.Factory factory) {
+      return factory;
     }
 
   }
 
-  @dagger.Module(//
-      injects = VerisignMDNSResourceRecordSetApi.Factory.class, //
-      complete = false, overrides = true, // Options
+  @dagger.Module(injects = VerisignMDNSResourceRecordSetApi.Factory.class, complete = false, overrides = true,
       includes = {XMLCodec.class})
   public static final class FeignModule {
 
+    @Provides
+    @Singleton
+    VerisignMDNS verisignMDNS(Feign feign, VerisignMDNSTarget target) {
+      return feign.newInstance(target);
+    }
+    
     @Provides
     Logger logger() {
       return new Logger.NoOpLogger();
@@ -130,44 +128,46 @@ public class VerisignMDNSProvider extends BasicProvider {
 
     @Provides
     @Singleton
-    VerisignMDNS verisignMDNS(Feign feign, VerisignMDNSTarget target) {
-      return feign.newInstance(target);
-    }
-
-    @Provides
-    @Singleton
     Feign feign(Logger logger, Logger.Level logLevel, Encoder encoder, Decoder decoder,
         ErrorDecoder errorDecoder) {
 
       Options options = new Options(10 * 1000, 10 * 60 * 1000);
 
-      return Feign.builder().logger(logger).logLevel(logLevel).options(options).encoder(encoder)
-          .decoder(decoder).errorDecoder(errorDecoder).build();
+      return Feign.builder()
+          .logger(logger)
+          .logLevel(logLevel)
+          .options(options)
+          .encoder(encoder)
+          .decoder(decoder)
+          .errorDecoder(errorDecoder)
+          .build();
     }
-
   }
 
-  @dagger.Module(injects = {Encoder.class, Decoder.class, ErrorDecoder.class}, overrides = true)
+  @dagger.Module(injects = {Encoder.class,
+                            Decoder.class,
+                            ErrorDecoder.class},
+                 overrides = true)
   static final class XMLCodec {
 
     @Provides
     Encoder encoder() {
-      return new VerisignMDNSSaxEncoder();
+      return new VerisignMDNSEncoder();
     }
 
     @Provides
     Decoder decoder() {
-      return SAXDecoder.builder().registerContentHandler(RRHandler.class)
-          .registerContentHandler(ZoneHandler.class).registerContentHandler(ZoneListHandler.class)
-          .registerContentHandler(VerisignMDNSError.class).build();
+      return SAXDecoder.builder()
+          .registerContentHandler(RRHandler.class)
+          .registerContentHandler(ZoneHandler.class)
+          .registerContentHandler(ZoneListHandler.class)
+          .registerContentHandler(VerisignMDNSError.class)
+          .build();
     }
 
     @Provides
     ErrorDecoder errorDecoder(Decoder decoder) {
-      return new VerisignMDNSSaxErrorDecoder(decoder);
+      return new VerisignMDNSErrorDecoder(decoder);
     }
-
-
   }
-
 }
