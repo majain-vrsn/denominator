@@ -27,8 +27,6 @@ import feign.Feign;
 import feign.Logger;
 import feign.Request.Options;
 import feign.codec.Decoder;
-import feign.codec.Encoder;
-import feign.codec.ErrorDecoder;
 import feign.sax.SAXDecoder;
 
 public class VerisignMDNSProvider extends BasicProvider {
@@ -106,8 +104,8 @@ public class VerisignMDNSProvider extends BasicProvider {
 
   }
 
-  @dagger.Module(injects = VerisignMDNSResourceRecordSetApi.Factory.class, complete = false, overrides = true,
-      includes = {XMLCodec.class})
+  @dagger.Module(injects = VerisignMDNSResourceRecordSetApi.Factory.class, complete = false,
+      overrides = true)
   public static final class FeignModule {
 
     @Provides
@@ -115,7 +113,7 @@ public class VerisignMDNSProvider extends BasicProvider {
     VerisignMDNS verisignMDNS(Feign feign, VerisignMDNSTarget target) {
       return feign.newInstance(target);
     }
-    
+
     @Provides
     Logger logger() {
       return new Logger.NoOpLogger();
@@ -128,46 +126,28 @@ public class VerisignMDNSProvider extends BasicProvider {
 
     @Provides
     @Singleton
-    Feign feign(Logger logger, Logger.Level logLevel, Encoder encoder, Decoder decoder,
-        ErrorDecoder errorDecoder) {
+    Feign feign(Logger logger, Logger.Level logLevel) {
 
       Options options = new Options(10 * 1000, 10 * 60 * 1000);
+      Decoder decoder = decoder();
 
       return Feign.builder()
           .logger(logger)
           .logLevel(logLevel)
           .options(options)
-          .encoder(encoder)
+          .encoder(new VerisignMDNSEncoder())
           .decoder(decoder)
-          .errorDecoder(errorDecoder)
+          .errorDecoder(new VerisignMDNSErrorDecoder(decoder))
           .build();
     }
-  }
 
-  @dagger.Module(injects = {Encoder.class,
-                            Decoder.class,
-                            ErrorDecoder.class},
-                 overrides = true)
-  static final class XMLCodec {
-
-    @Provides
-    Encoder encoder() {
-      return new VerisignMDNSEncoder();
-    }
-
-    @Provides
-    Decoder decoder() {
+    static Decoder decoder() {
       return SAXDecoder.builder()
           .registerContentHandler(RRHandler.class)
           .registerContentHandler(ZoneHandler.class)
           .registerContentHandler(ZoneListHandler.class)
           .registerContentHandler(VerisignMDNSError.class)
           .build();
-    }
-
-    @Provides
-    ErrorDecoder errorDecoder(Decoder decoder) {
-      return new VerisignMDNSErrorDecoder(decoder);
     }
   }
 }
