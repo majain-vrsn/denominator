@@ -46,7 +46,6 @@ class VerisignMDNSContentHandlers {
       if (parentEl.equals(qName)) {
         elements = null;
       }
-
     }
 
     @Override
@@ -56,14 +55,12 @@ class VerisignMDNSContentHandlers {
       }
 
       processElValue(elements.peek(), ch, start, length);
-
     }
 
     protected abstract void processElValue(String currentEl, char[] ch, int start, int length);
   }
 
   static class ZoneHandler extends ElementHandler implements ContentHandlerWithResult<Zone> {
-
     Zone zone = null;
     int count = 0;
 
@@ -73,27 +70,24 @@ class VerisignMDNSContentHandlers {
 
     @Override
     protected void processElValue(String currentEl, char[] ch, int start, int length) {
-
       if ("ns4:domainName".equals(currentEl)) {
         String value = val(ch, start, length);
         zone = Zone.create(value, value, 86400, "nil." + value);
       }
-
     }
 
     @Override
     public Zone result() {
       return zone;
     }
-
   }
 
   static class ZoneListHandler extends ElementHandler implements
       ContentHandlerWithResult<Page<Zone>> {
 
-    List<Zone> zones = new ArrayList<Zone>();
     int count = 0;
-
+    List<Zone> zones = new ArrayList<Zone>();
+    
     ZoneListHandler() {
       super("ns4:getZoneListRes");
     }
@@ -104,24 +98,21 @@ class VerisignMDNSContentHandlers {
       if ("ns4:totalCount".equals(currentEl)) {
         String value = val(ch, start, length);
         count = Integer.valueOf(value);
-
       } else if ("ns4:domainName".equals(currentEl)) {
         String value = val(ch, start, length);
         zones.add(Zone.create(value, value, 86400, "nil." + value));
       }
-
     }
 
     @Override
     public Page<Zone> result() {
       return new Page<Zone>(zones, count);
     }
-
   }
 
   static class RRHandler extends ElementHandler implements
       ContentHandlerWithResult<Page<ResourceRecord>> {
-
+    
     int count = 0;
     List<ResourceRecord> rrList = new ArrayList<ResourceRecord>();
 
@@ -138,17 +129,14 @@ class VerisignMDNSContentHandlers {
       }
     }
 
-
     @Override
     protected void processElValue(String currentEl, char[] ch, int start, int length) {
-
       if (rrList.isEmpty()) {
         return;
       }
 
       ResourceRecord resourceRecord = rrList.get(rrList.size() - 1);
       String value = val(ch, start, length);
-
       if ("ns4:totalCount".equals(currentEl)) {
         count = Integer.valueOf(value);
       } else if ("ns4:resourceRecordId".equals(currentEl)) {
@@ -162,15 +150,12 @@ class VerisignMDNSContentHandlers {
       } else if ("ns4:ttl".equals(currentEl)) {
         resourceRecord.ttl = value;
       }
-
     }
 
     @Override
     public Page<ResourceRecord> result() {
       return new Page<ResourceRecord>(rrList, count);
     }
-
-
   }
 
   static String val(char[] ch, int start, int length) {
@@ -185,7 +170,6 @@ class VerisignMDNSContentHandlers {
       this.list = list;
       this.count = count;
     }
-
   }
 
   static class ResourceRecord {
@@ -195,5 +179,4 @@ class VerisignMDNSContentHandlers {
     String rdata;
     String ttl;
   }
-
 }
