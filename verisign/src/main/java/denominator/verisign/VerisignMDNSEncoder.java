@@ -12,7 +12,7 @@ import feign.RequestTemplate;
 import feign.codec.EncodeException;
 import feign.codec.Encoder;
 
-class VerisignMDNSEncoder implements Encoder {
+final class VerisignMDNSEncoder implements Encoder {
 
   private static final String NS_API_1 = "api1";
   private static final String NS_API_2 = "api2";

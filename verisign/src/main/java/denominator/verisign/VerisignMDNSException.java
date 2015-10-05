@@ -2,7 +2,7 @@ package denominator.verisign;
 
 import feign.FeignException;
 
-class VerisignMDNSException extends FeignException {
+final class VerisignMDNSException extends FeignException {
 
   private static final long serialVersionUID = 1L;
   private final String code;

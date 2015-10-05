@@ -16,7 +16,7 @@ import feign.codec.Decoder;
 import feign.codec.ErrorDecoder;
 import feign.sax.SAXDecoder.ContentHandlerWithResult;
 
-class VerisignMDNSErrorDecoder implements ErrorDecoder {
+final class VerisignMDNSErrorDecoder implements ErrorDecoder {
 
   private final Decoder decoder;
 

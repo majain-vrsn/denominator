@@ -12,7 +12,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import denominator.model.Zone;
 import feign.sax.SAXDecoder.ContentHandlerWithResult;
 
-class VerisignMDNSContentHandlers {
+final class VerisignMDNSContentHandlers {
 
   static abstract class ElementHandler extends DefaultHandler {
 
@@ -72,7 +72,7 @@ class VerisignMDNSContentHandlers {
     protected void processElValue(String currentEl, char[] ch, int start, int length) {
       if ("ns4:domainName".equals(currentEl)) {
         String value = val(ch, start, length);
-        zone = Zone.create(value, value, 86400, "nil." + value);
+        zone = Zone.create(value, value, 86400, "nil@" + value);
       }
     }
 
@@ -100,7 +100,7 @@ class VerisignMDNSContentHandlers {
         count = Integer.valueOf(value);
       } else if ("ns4:domainName".equals(currentEl)) {
         String value = val(ch, start, length);
-        zones.add(Zone.create(value, value, 86400, "nil." + value));
+        zones.add(Zone.create(value, value, 86400, "nil@" + value));
       }
     }
 

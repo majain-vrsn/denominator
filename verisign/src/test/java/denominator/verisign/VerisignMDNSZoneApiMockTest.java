@@ -22,7 +22,7 @@ public class VerisignMDNSZoneApiMockTest {
     ZoneApi api = server.connect().api().zones();
 
     assertThat(api.iterator()).containsExactly(
-        Zone.create("denominator.io", "denominator.io", 86400, "nil.denominator.io"));
+        Zone.create("denominator.io", "denominator.io", 86400, "nil@denominator.io"));
   }
 
   @Test
@@ -40,7 +40,7 @@ public class VerisignMDNSZoneApiMockTest {
     ZoneApi api = server.connect().api().zones();
 
     assertThat(api.iterateByName("denominator.io")).containsExactly(
-        Zone.create("denominator.io", "denominator.io", 86400, "nil.denominator.io"));
+        Zone.create("denominator.io", "denominator.io", 86400, "nil@denominator.io"));
   }
 
   @Test
@@ -58,7 +58,7 @@ public class VerisignMDNSZoneApiMockTest {
 
     ZoneApi api = server.connect().api().zones();
 
-    Zone zone = Zone.create("denominator.io", "denominator.io", 86400, "nil.denominator.io");
+    Zone zone = Zone.create("denominator.io", "denominator.io", 86400, "nil@denominator.io");
     api.put(zone);
   }
 
@@ -68,7 +68,7 @@ public class VerisignMDNSZoneApiMockTest {
     server.enqueue(new MockResponse());
     ZoneApi api = server.connect().api().zones();
 
-    Zone zone = Zone.create("denominator.io", "denominator.io", 86400, "nil.denominator.io");
+    Zone zone = Zone.create("denominator.io", "denominator.io", 86400, "nil@denominator.io");
     assertThat(api.put(zone)).isEqualTo(zone.name());
   }
 
@@ -117,7 +117,7 @@ public class VerisignMDNSZoneApiMockTest {
        + "  <ns4:createTimestamp>2015-09-29T13:58:53.000Z</ns4:createTimestamp>"
        + "  <ns4:updateTimestamp>2015-09-29T14:41:11.000Z</ns4:updateTimestamp>"
        + "  <ns4:zoneSOAInfo>"
-       + "     <ns4:email>nil.denominator.io</ns4:email>"
+       + "     <ns4:email>nil@denominator.io</ns4:email>"
        + "     <ns4:retry>7400</ns4:retry>"
        + "     <ns4:ttl>23456</ns4:ttl>"
        + "     <ns4:refresh>30000</ns4:refresh>"

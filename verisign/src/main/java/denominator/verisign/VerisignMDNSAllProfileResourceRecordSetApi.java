@@ -23,7 +23,7 @@ import denominator.model.ResourceRecordSet;
 import denominator.model.ResourceRecordSet.Builder;
 import denominator.verisign.VerisignMDNSEncoder.GetRRList;
 
-public final class VerisignMDNSAllProfileResourceRecordSetApi implements
+final class VerisignMDNSAllProfileResourceRecordSetApi implements
     AllProfileResourceRecordSetApi {
 
   private final VerisignMDNS api;

@@ -27,7 +27,7 @@ public class VerisignMdnsTest {
     // Setup test data
     String zoneName = "testzone-" + System.currentTimeMillis() + ".com";
     int ttl = 86400;
-    String email = "nil." + zoneName;
+    String email = "nil@" + zoneName;
 
     // createZone
     System.out.println("\nCreating zone...");
@@ -68,7 +68,7 @@ public class VerisignMdnsTest {
     // Setup test data
     String zoneName = "testzone-" + System.currentTimeMillis() + ".com";
     int ttl = 86400;
-    String email = "nil." + zoneName;
+    String email = "nil@" + zoneName;
 
     // createZone
     System.out.println("\nCreating zone...");

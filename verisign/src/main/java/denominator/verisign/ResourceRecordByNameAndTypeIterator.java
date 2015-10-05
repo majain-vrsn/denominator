@@ -15,7 +15,7 @@ import denominator.verisign.VerisignMDNSContentHandlers.ResourceRecord;
 import denominator.verisign.VerisignMDNSEncoder.GetRRList;
 import denominator.verisign.VerisignMDNSEncoder.Paging;
 
-class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceRecordSet<?>> {
+final class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceRecordSet<?>> {
 
   private static final int PAGE_SIZE = 100;
 

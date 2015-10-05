@@ -10,7 +10,7 @@ import denominator.model.Zone;
 import denominator.verisign.VerisignMDNSContentHandlers.Page;
 import denominator.verisign.VerisignMDNSEncoder.Paging;
 
-public final class VerisignMDNSZoneApi implements denominator.ZoneApi {
+final class VerisignMDNSZoneApi implements denominator.ZoneApi {
 
   private static final int PAGE_SIZE = 100;
 
