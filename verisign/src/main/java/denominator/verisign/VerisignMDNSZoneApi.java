@@ -61,7 +61,15 @@ final class VerisignMDNSZoneApi implements denominator.ZoneApi {
   public Iterator<Zone> iterateByName(String name) {
     List<Zone> zones = new ArrayList<Zone>();
 
-    Zone zone = api.getZone(name);
+    Zone zone = null;
+    try {
+      zone = api.getZone(name);
+    } catch (VerisignMDNSException e) {
+      if (!e.code().equalsIgnoreCase("ERROR_OPERATION_FAILURE")) {
+        throw e;
+      }
+    }
+    
     if (zone != null)
       zones.add(zone);
 

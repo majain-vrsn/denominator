@@ -104,8 +104,7 @@ public class VerisignMDNSProvider extends BasicProvider {
 
   }
 
-  @dagger.Module(injects = VerisignMDNSResourceRecordSetApi.Factory.class, complete = false,
-      overrides = true)
+  @dagger.Module(injects = VerisignMDNSResourceRecordSetApi.Factory.class, complete = false)
   public static final class FeignModule {
 
     @Provides
