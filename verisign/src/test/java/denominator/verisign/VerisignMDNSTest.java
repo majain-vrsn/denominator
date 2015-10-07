@@ -16,20 +16,19 @@ import denominator.model.Zone;
 
 public class VerisignMDNSTest {
 
- 
   @Test
   public void zoneTest() {
 
     DNSApiManager manager =
         Denominator.create("verisignmdns", credentials("testuser1", "end-points.com"));
-    System.out.println( manager.checkConnection());
-   
+    System.out.println(manager.checkConnection());
+
     ZoneApi zoneApi = manager.api().zones();
 
     // Setup test data
-    String zoneName = "testzone-" + System.currentTimeMillis() + ".com";
+    String zoneName = "testzone-" + System.currentTimeMillis() + ".io";
     int ttl = 86400;
-    String email = "nil@" + zoneName;
+    String email = "user@" + zoneName;
 
     // createZone
     System.out.println("\nCreating zone...");
@@ -38,10 +37,10 @@ public class VerisignMDNSTest {
     // getZoneInfo
     System.out.println("\nQuerying zone by name...");
     Iterator<Zone> zoneIterator = zoneApi.iterateByName(zoneName);
-//    while (zoneIterator.hasNext()) {
-//      System.out.printf("\t%s", zoneIterator.next());
-//      System.out.println();
-//    }
+    while (zoneIterator.hasNext()) {
+      System.out.printf("\t%s", zoneIterator.next());
+      System.out.println();
+    }
 
     // getZoneList
     System.out.println("\nQuerying zones for an account...");
@@ -52,7 +51,6 @@ public class VerisignMDNSTest {
       count++;
     }
     System.out.println("\tZone Size:" + count);
-
 
     // deleteZone
     System.out.println("Deleting zone...");
@@ -68,9 +66,9 @@ public class VerisignMDNSTest {
         Denominator.create("verisignmdns", credentials("vrsniotteam", "end-points.com"));
 
     // Setup test data
-    String zoneName = "testzone-" + System.currentTimeMillis() + ".com";
+    String zoneName = "testzone-" + System.currentTimeMillis() + ".io";
     int ttl = 86400;
-    String email = "nil@" + zoneName;
+    String email = "user@" + zoneName;
 
     // createZone
     System.out.println("\nCreating zone...");
@@ -85,11 +83,6 @@ public class VerisignMDNSTest {
     // Add A record
     recordSetsInZoneApi.put(ResourceRecordSet.builder().name("www").type("A")
         .add(Util.toMap("A", "127.0.0.1")).build());
-    
-//    Map<String, Object> x = new HashMap();
-//    x.put("CUSTOM", "CUSTOM-VAL");
-//    recordSetsInZoneApi.put(ResourceRecordSet.builder().name("www").type("CUSTOM")
-//        .add(x).build());
 
     // Add TLSA record
     recordSetsInZoneApi.put(ResourceRecordSet
@@ -99,22 +92,6 @@ public class VerisignMDNSTest {
         .add(
             Util.toMap("CERT",
                 "3 1 1 b760c12119c388736da724df1224d21dfd23bf03366c286de1a4125369ef7de0")).build());
-
-    // Add SMIMEA record
-    //    MDNS currently does not support SMIMEA per latest dane-smime draft
-    //    https://tools.ietf.org/html/draft-ietf-dane-smime-09
-    //    
-    // recordSetsInZoneApi
-    // .put(ResourceRecordSet
-    // .builder()
-    // .name("c93f1e400f26708f98cb19d936620da35eec8f72e57f9eec01c1afd6._smimecert")
-    // .type("SMIMEA")
-    // .add(
-    // Util.toMap(
-    // "CERT",
-    // "3 1 1 b760c12119c388736da724df1224d21dfd23bf03366c286de1a4125369ef7de0"))
-    // .build());
-
 
     // getResourceRecords
     System.out.println("\nQuerying resource records...");
