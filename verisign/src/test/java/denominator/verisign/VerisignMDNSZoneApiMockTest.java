@@ -17,8 +17,8 @@ public class VerisignMDNSZoneApiMockTest {
 
   @Test
   public void iteratorWhenPresent() throws Exception {
-
-    server.enqueue(getZoneListRes);
+    server.enqueue(getZoneListRes);    
+    server.enqueue(getZoneInfoRes);
     ZoneApi api = server.connect().api().zones();
 
     assertThat(api.iterator()).containsExactly(
