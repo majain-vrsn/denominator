@@ -29,7 +29,7 @@ final class VerisignMDNSZoneApi implements denominator.ZoneApi {
     final Iterator<Zone> currentIterator = page.list.iterator();
 
     if (pages == 1) {
-      return currentIterator;
+      return iterateByName(currentIterator.next().name());
     }
 
     return new Iterator<Zone>() {

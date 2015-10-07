@@ -2,7 +2,6 @@ package denominator.verisign;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -52,10 +51,11 @@ public class VerisignMDNSZoneApiMockTest {
     assertThat(api.iterateByName("denominator.io.")).isEmpty();
   }
 
-  @Ignore
+  @Test
   public void putWhenPresent() throws Exception {
     server.enqueueError("ERROR_OPERATION_FAILURE",
         "Domain already exists. Please verify your domain name.");
+    server.enqueue(new MockResponse());
 
     ZoneApi api = server.connect().api().zones();
 
@@ -63,9 +63,9 @@ public class VerisignMDNSZoneApiMockTest {
     api.put(zone);
   }
 
-  @Ignore
+  @Test
   public void putWhenAbsent() throws Exception {
-
+    server.enqueue(new MockResponse());
     server.enqueue(new MockResponse());
     ZoneApi api = server.connect().api().zones();
 
