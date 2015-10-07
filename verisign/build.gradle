@@ -3,10 +3,10 @@ apply plugin: 'java'
 sourceCompatibility = 1.6
 
 test {
-  systemProperty 'ultradns.url', System.getProperty('ultradns.url', '')
-  systemProperty 'ultradns.username', System.getProperty('ultradns.username', '')
-  systemProperty 'ultradns.password', System.getProperty('ultradns.password', '')
-  systemProperty 'ultradns.zone', System.getProperty('ultradns.zone', '')
+  systemProperty 'verisignmdns.url', System.getProperty('verisignmdns.url', '')
+  systemProperty 'verisignmdns.username', System.getProperty('verisignmdns.username', '')
+  systemProperty 'verisignmdns.password', System.getProperty('verisignmdns.password', '')
+  systemProperty 'verisignmdns.zone', System.getProperty('verisignmdns.zone', '')
 }
 
 dependencies {
