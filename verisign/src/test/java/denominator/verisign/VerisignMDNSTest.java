@@ -55,8 +55,6 @@ public class VerisignMDNSTest {
     // deleteZone
     System.out.println("Deleting zone...");
     zoneApi.delete(zoneName);
-
-    System.out.println("\nDone.");
   }
 
   @Test
@@ -78,7 +76,7 @@ public class VerisignMDNSTest {
     AllProfileResourceRecordSetApi recordSetsInZoneApi = manager.api().recordSetsInZone(zoneId);
 
     // Add ResourceRecord record
-    System.out.println("\nAdding resource record...");
+    System.out.println("\nAdding resource records...");
 
     // Add A record
     recordSetsInZoneApi.put(ResourceRecordSet.builder().name("www").type("A")
@@ -103,7 +101,7 @@ public class VerisignMDNSTest {
     }
 
     // getResourceRecordByName
-    System.out.println("\nQuerying A resource record by name...");
+    System.out.println("\nQuerying resource record by name...");
     rrsIterator = recordSetsInZoneApi.iterateByName("www");
     while (rrsIterator.hasNext()) {
       ResourceRecordSet<?> rrs = rrsIterator.next();
@@ -112,7 +110,7 @@ public class VerisignMDNSTest {
     }
 
     // getResourceRecordByNameAndType
-    System.out.println("\nQuerying A resource record by name and rrType...");
+    System.out.println("\nQuerying resource record by name and rrType...");
     rrsIterator = recordSetsInZoneApi.iterateByNameAndType("www", "A");
     while (rrsIterator.hasNext()) {
       ResourceRecordSet<?> rrs = rrsIterator.next();
@@ -121,14 +119,11 @@ public class VerisignMDNSTest {
     }
 
     // delete Resource Record
-    System.out.println("\nDeleting A resource record...");
+    System.out.println("\nDeleting resource record...");
     recordSetsInZoneApi.deleteByNameAndType("www", "A");
 
     // deleteZone
     System.out.println("Deleting zone...");
     zoneApi.delete(zoneName);
-
-    System.out.println("\nDone.");
   }
-
 }
