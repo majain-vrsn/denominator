@@ -23,7 +23,7 @@ public class VerisignMDNSResourceRecordSetApiMockTest {
     AllProfileResourceRecordSetApi recordSetsInZoneApi = server.connect().api().recordSetsInZone("denominator.io");
 
     assertThat(recordSetsInZoneApi.iterator()).containsExactly(
-        ResourceRecordSet.builder().name("www.denominator.io.").type("A").ttl(86400)
+        ResourceRecordSet.builder().name("www").type("A").ttl(86400)
         .add(Util.toMap("A", "127.0.0.1")).build());
   }
 
@@ -42,8 +42,8 @@ public class VerisignMDNSResourceRecordSetApiMockTest {
     
     AllProfileResourceRecordSetApi recordSetsInZoneApi = server.connect().api().recordSetsInZone("denominator.io");
 
-    assertThat(recordSetsInZoneApi.iterateByName("www.denominator.io")).containsExactly(
-        ResourceRecordSet.builder().name("www.denominator.io.").type("A").ttl(86400)
+    assertThat(recordSetsInZoneApi.iterateByName("www")).containsExactly(
+        ResourceRecordSet.builder().name("www").type("A").ttl(86400)
         .add(Util.toMap("A", "127.0.0.1")).build());
   }
 

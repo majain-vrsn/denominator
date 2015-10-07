@@ -62,6 +62,9 @@ final class VerisignMDNSContentHandlers {
 
   static class ZoneHandler extends ElementHandler implements ContentHandlerWithResult<Zone> {
     Zone zone = null;
+    String domainName;
+    String email;
+    int ttl;
     int count = 0;
 
     ZoneHandler() {
@@ -71,13 +74,18 @@ final class VerisignMDNSContentHandlers {
     @Override
     protected void processElValue(String currentEl, char[] ch, int start, int length) {
       if ("ns4:domainName".equals(currentEl)) {
-        String value = val(ch, start, length);
-        zone = Zone.create(value, value, 86400, "nil@" + value);
+        domainName = val(ch, start, length);
+      } else if ("ns4:email".equals(currentEl)) {
+        email = val(ch, start, length);
+      } else if ("ns4:ttl".equals(currentEl)) {
+        ttl = Integer.valueOf(val(ch, start, length));
       }
     }
 
     @Override
     public Zone result() {
+      if(domainName != null)
+        zone = Zone.create(domainName, domainName, ttl, email);
       return zone;
     }
   }
@@ -87,7 +95,7 @@ final class VerisignMDNSContentHandlers {
 
     int count = 0;
     List<Zone> zones = new ArrayList<Zone>();
-    
+
     ZoneListHandler() {
       super("ns4:getZoneListRes");
     }
@@ -112,7 +120,7 @@ final class VerisignMDNSContentHandlers {
 
   static class RRHandler extends ElementHandler implements
       ContentHandlerWithResult<Page<ResourceRecord>> {
-    
+
     int count = 0;
     List<ResourceRecord> rrList = new ArrayList<ResourceRecord>();
 

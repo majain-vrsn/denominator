@@ -86,6 +86,7 @@ final class VerisignMDNSZoneApi implements denominator.ZoneApi {
       }
     }
 
+    api.updateSoa(zone);    
     return zone.name();
   }
 

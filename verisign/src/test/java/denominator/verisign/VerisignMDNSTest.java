@@ -14,14 +14,16 @@ import denominator.common.Util;
 import denominator.model.ResourceRecordSet;
 import denominator.model.Zone;
 
-public class VerisignMdnsTest {
+public class VerisignMDNSTest {
 
  
   @Test
   public void zoneTest() {
 
     DNSApiManager manager =
-        Denominator.create("verisignmdns", credentials("vrsniotteam", "end-points.com"));
+        Denominator.create("verisignmdns", credentials("testuser1", "end-points.com"));
+    System.out.println( manager.checkConnection());
+   
     ZoneApi zoneApi = manager.api().zones();
 
     // Setup test data
@@ -36,10 +38,10 @@ public class VerisignMdnsTest {
     // getZoneInfo
     System.out.println("\nQuerying zone by name...");
     Iterator<Zone> zoneIterator = zoneApi.iterateByName(zoneName);
-    while (zoneIterator.hasNext()) {
-      System.out.printf("\t%s", zoneIterator.next());
-      System.out.println();
-    }
+//    while (zoneIterator.hasNext()) {
+//      System.out.printf("\t%s", zoneIterator.next());
+//      System.out.println();
+//    }
 
     // getZoneList
     System.out.println("\nQuerying zones for an account...");

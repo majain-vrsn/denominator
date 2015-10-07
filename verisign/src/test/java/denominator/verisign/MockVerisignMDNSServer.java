@@ -59,6 +59,10 @@ public class MockVerisignMDNSServer extends VerisignMDNSProvider implements Test
     delegate.enqueue(new MockResponse().setResponseCode(500).setBody(
         format(FAULT_TEMPLATE, description, code, description)));
   }
+  
+  RecordedRequestAssert assertRequest() throws InterruptedException {
+    return assertThat(delegate.takeRequest());
+  }
 
   RecordedRequestAssert assertSoapBody(String soapBody) throws InterruptedException {
     return assertThat(delegate.takeRequest()).hasMethod("POST").hasPath("/")

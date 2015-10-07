@@ -54,8 +54,7 @@ public class VerisignMDNSProvider extends BasicProvider {
   @Override
   public Set<String> basicRecordTypes() {
     Set<String> types = new LinkedHashSet<String>();
-    types.addAll(Arrays.asList("A", "AAAA", "CNAME", "HINFO", "MX", "NAPTR", "NS", "PTR", "RP",
-        "SOA", "SPF", "SRV", "TXT"));
+    types.addAll(Arrays.asList("A", "AAAA", "CNAME", "MX", "NAPTR", "NS", "PTR", "SRV", "TXT"));
     return types;
   }
 

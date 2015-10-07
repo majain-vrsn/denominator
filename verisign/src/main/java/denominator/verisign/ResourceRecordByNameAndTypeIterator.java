@@ -4,6 +4,7 @@ import static denominator.common.Util.peekingIterator;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import denominator.common.PeekingIterator;
@@ -58,9 +59,16 @@ final class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceReco
       return null;
     }
 
+    String owner = record.name;
+    String newOwner = record.name;
+    String replacement = "." + getRRList.zoneName + ".";
+    if (owner.endsWith(replacement)) {
+      newOwner = owner.substring(0, owner.lastIndexOf(replacement));
+    }
+
     String type = record.type;
     Builder<Map<String, Object>> builder =
-        ResourceRecordSet.builder().name(record.name).type(type).ttl(Integer.valueOf(record.ttl));
+        ResourceRecordSet.builder().name(newOwner).type(type).ttl(Integer.valueOf(record.ttl));
     builder.add(getRRTypeAndRdata(type, record.rdata));
 
     while (hasNext()) {
@@ -85,7 +93,26 @@ final class ResourceRecordByNameAndTypeIterator implements Iterator<ResourceReco
   }
 
   private static Map<String, Object> getRRTypeAndRdata(String type, String rdata) {
+
+    rdata = rdata.replace("\"", "");
     try {
+      if ("AAAA".equals(type)) {
+        rdata = rdata.toUpperCase();
+      } else if ("NAPTR".equals(type)) {
+        List<String> parts = Util.split(' ', rdata);
+
+        String services = parts.get(3);
+        String newServices = parts.get(3);
+        if (services != null) {
+          String servicesId = Util.split('+', services).get(0);
+          newServices = services.replace(servicesId, servicesId.toUpperCase());
+        }
+
+        rdata =
+            String.format("%d %d %s %s %s %s ", Integer.valueOf(parts.get(0)),
+                Integer.valueOf(parts.get(1)), parts.get(2).toUpperCase(), newServices,
+                parts.get(4), parts.get(5));
+      }
       return Util.toMap(type, rdata);
     } catch (IllegalArgumentException e) {
       Map<String, Object> map = new LinkedHashMap<String, Object>();

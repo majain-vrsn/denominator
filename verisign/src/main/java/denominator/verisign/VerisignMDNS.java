@@ -15,6 +15,9 @@ interface VerisignMDNS {
   void createZone(@Param("createZone") Zone zone);
 
   @RequestLine("POST")
+  void updateSoa(@Param("updateSoa") Zone zone);
+  
+  @RequestLine("POST")
   void deleteZone(@Param("deleteZone") String zone);
 
   @RequestLine("POST")

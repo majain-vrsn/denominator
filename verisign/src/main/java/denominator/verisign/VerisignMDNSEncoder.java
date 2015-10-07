@@ -28,6 +28,8 @@ final class VerisignMDNSEncoder implements Encoder {
       node = encodeRRSet(params);
     } else if (params.containsKey("createZone")) {
       node = encodeCreateZone(params);
+    } else if (params.containsKey("updateSoa")) {
+      node = encodeUpdateSoa(params);
     } else if (params.containsKey("getZone")) {
       node = encodeGetZone(params);
     } else if (params.containsKey("getZoneList")) {
@@ -59,8 +61,33 @@ final class VerisignMDNSEncoder implements Encoder {
     return zoneNode;
   }
 
-  private Node encodeGetZone(Map<String, ?> params) {
+  private Node encodeUpdateSoa(Map<String, ?> params) {
+
+    Object updateSoaObj = params.get("updateSoa");
+    if (updateSoaObj == null) {
+      return null;
+    }
+
+    Zone zone = Zone.class.cast(updateSoaObj);
+    TagNode zoneNode = new TagNode(NS_API_1, "updateSOA");
+    zoneNode.add(new TagNode(NS_API_1, "domainName").add(new TextNode(zone.name())));
     
+    String email = zone.email().replace("@", ".");
+    if (!email.endsWith("."))
+      email = email + ".";
+    
+    TagNode soaNode = new TagNode(NS_API_1, "zoneSOAInfo");
+    soaNode.add(new TagNode(NS_API_1, "email").add(new TextNode(email)));
+    soaNode.add(new TagNode(NS_API_1, "retry").add(new TextNode(Integer.toString(7200))));
+    soaNode.add(new TagNode(NS_API_1, "ttl").add(new TextNode(Integer.toString(zone.ttl()))));
+    soaNode.add(new TagNode(NS_API_1, "refresh").add(new TextNode(Integer.toString(86400))));
+    soaNode.add(new TagNode(NS_API_1, "expire").add(new TextNode(Integer.toString(1209600))));
+    zoneNode.add(soaNode);
+    return zoneNode;
+  }
+
+  private Node encodeGetZone(Map<String, ?> params) {
+
     Object getZoneObj = params.get("getZone");
     if (getZoneObj == null) {
       return null;
@@ -146,7 +173,8 @@ final class VerisignMDNSEncoder implements Encoder {
     }
 
     if (getRRList.type != null) {
-      getRRListNode.add(new TagNode(NS_API_1, "resourceRecordType").add(new TextNode(getRRList.type)));
+      getRRListNode.add(new TagNode(NS_API_1, "resourceRecordType")
+          .add(new TextNode(getRRList.type)));
     }
 
     if (getRRList.paging != null) {
@@ -221,7 +249,7 @@ final class VerisignMDNSEncoder implements Encoder {
   class TextNode implements Node {
 
     private final String value;
-    
+
     TextNode(String value) {
       this.value = value;
     }
