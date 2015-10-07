@@ -1,11 +1,17 @@
 package denominator.verisign;
 
 import static denominator.CredentialsConfiguration.credentials;
+import static feign.Util.emptyToNull;
+import static java.lang.System.getProperty;
 
 import java.util.Iterator;
 
+import javax.inject.Singleton;
+
 import org.junit.Test;
 
+import dagger.Module;
+import dagger.Provides;
 import denominator.AllProfileResourceRecordSetApi;
 import denominator.DNSApiManager;
 import denominator.Denominator;
@@ -13,16 +19,24 @@ import denominator.ZoneApi;
 import denominator.common.Util;
 import denominator.model.ResourceRecordSet;
 import denominator.model.Zone;
+import feign.Logger;
 
 public class VerisignMDNSTest {
 
+  final DNSApiManager manager;
+
+  public VerisignMDNSTest() throws Exception {
+    String username = emptyToNull(getProperty("verisignmdns.username"));
+    String password = emptyToNull(getProperty("verisignmdns.password"));
+    if (username != null && password != null) {
+      manager = create(username, password);
+    } else {
+      throw new Exception("Missing Authentication data.");
+    }
+  }
+
   @Test
   public void zoneTest() {
-
-    DNSApiManager manager =
-        Denominator.create("verisignmdns", credentials("testuser1", "end-points.com"));
-    System.out.println(manager.checkConnection());
-
     ZoneApi zoneApi = manager.api().zones();
 
     // Setup test data
@@ -59,9 +73,6 @@ public class VerisignMDNSTest {
 
   @Test
   public void rrSetTest() {
-
-    DNSApiManager manager =
-        Denominator.create("verisignmdns", credentials("vrsniotteam", "end-points.com"));
 
     // Setup test data
     String zoneName = "testzone-" + System.currentTimeMillis() + ".io";
@@ -125,5 +136,27 @@ public class VerisignMDNSTest {
     // deleteZone
     System.out.println("Deleting zone...");
     zoneApi.delete(zoneName);
+  }
+
+  static DNSApiManager create(String username, String password) {
+    VerisignMDNSProvider provider =
+        new VerisignMDNSProvider(emptyToNull(getProperty("verisignmdns.url")));
+    return Denominator.create(provider, credentials(username, password), new Overrides());
+  }
+
+  @Module(overrides = true, library = true)
+  static class Overrides {
+
+    @Provides
+    @Singleton
+    Logger.Level provideLevel() {
+      return Logger.Level.FULL;
+    }
+
+    @Provides
+    @Singleton
+    Logger provideLogger() {
+      return new Logger.JavaLogger().appendToFile("build/http-wire.log");
+    }
   }
 }
