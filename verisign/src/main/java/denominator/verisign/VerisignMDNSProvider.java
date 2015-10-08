@@ -72,14 +72,10 @@ public class VerisignMDNSProvider extends BasicProvider {
   public static final class Module {
 
     @Provides
-    CheckConnection alwaysOK() {
-      return new CheckConnection() {
-        public boolean ok() {
-          return true;
-        }
-      };
+    CheckConnection checkConnection(HostedZonesReadable checkConnection) {
+      return checkConnection;
     }
-
+    
     @Provides
     @Singleton
     ZoneApi provideZoneApi(VerisignMDNSZoneApi api) {
